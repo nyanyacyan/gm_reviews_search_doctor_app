@@ -1,5 +1,15 @@
+// Flutterの基本UIライブラリを読み込む
 import 'package:flutter/material.dart';
 
+// HTTP通信のためのパッケージを読み込む
+// yamlへ追加コマンド　=　flutter pub add http
+import 'package:http/http.dart' as http;
+
+// Jsonデータを扱うための標準ライブラリ
+import 'dart:convert';
+
+// アプリの起動時に最初に呼ばれる関数
+// どこに書いてもいいが慣習としては先頭に記述
 void main() {
   runApp(const MyApp());
 }
