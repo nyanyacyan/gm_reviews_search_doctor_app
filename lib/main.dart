@@ -15,6 +15,10 @@ import 'package:http/http.dart' as http;
 // Jsonデータを扱うための標準ライブラリ
 import 'dart:convert';
 
+// pubspec.yamlにdotenvを追加しておく必要がある
+// envファイルの読み込み
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 // アプリの起動時に最初に呼ばれる関数
 // どこに書いてもいいが慣習としては先頭に記述
 void main() {
@@ -82,9 +86,12 @@ class _SearchScreenState extends State<SearchScreen> {
     Future<void> searchPlaces() async {
         // .trim()	前後の空白を取り除く（スペースや改行を消してくれる）
         final station = _stationController.text.trim();
+
+        // stationが空文字かどうかをチェックする
+        // isEmptyは空文字を示す
         if (station.isEmpty) return;
 
-        const apiKey = "YOUR_GOOGLE_API_KEY";
+        final apiKey = dotenv.env['GOOGLE_API_KEY'];
 
         final geocodeUrl = "https://maps.googleapis.com/maps/api/geocode/json?address=$station&key=$apiKey";
         final geocodeResponse = await http.get(Uri.parse(geocodeUrl));
