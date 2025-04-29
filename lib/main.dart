@@ -24,7 +24,9 @@ import 'package:gm_reviews_search_doctor_app/strings.dart';
 
 // アプリの起動時に最初に呼ばれる関数
 // どこに書いてもいいが慣習としては先頭に記述
-void main() {
+Future<void> main() async{
+    // dotenvを初期化する
+    await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -91,7 +93,8 @@ class _SearchScreenState extends State<SearchScreen> {
     // isEmptyは空文字を示す
     if (station.isEmpty) return;
 
-    final apiKey = dotenv.env['GOOGLE_API_KEY'];
+    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
+    print('API Key: $apiKey');
 
     // HTTPGETリクエストするためのURLを作成
     final geocodeUrl =
@@ -123,7 +126,7 @@ class _SearchScreenState extends State<SearchScreen> {
       final placesData = json.decode(placesResponse.body);
 
       setState(() {
-        _places = placesData['results'] ?? [];
+        _places = List<Map<String, dynamic>>.from(placesData['results'] ?? []);
       });
     }
   }
