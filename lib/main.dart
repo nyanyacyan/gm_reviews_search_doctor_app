@@ -24,9 +24,9 @@ import 'package:gm_reviews_search_doctor_app/strings.dart';
 
 // アプリの起動時に最初に呼ばれる関数
 // どこに書いてもいいが慣習としては先頭に記述
-Future<void> main() async{
-    // dotenvを初期化する
-    await dotenv.load(fileName: ".env");
+Future<void> main() async {
+  // dotenvを初期化する
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -38,7 +38,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '医療機関検索Google口コミ順位アプリ',
+      title: '駅チカ 名医リサーチ | 口コミランキング',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
@@ -120,14 +120,14 @@ class _SearchScreenState extends State<SearchScreen> {
         '整形外科': 'doctor',
       };
 
-        final placesUrl =
-            "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-            "?location=$lat,$lng"
-            "&radius=1500"
-            "&type=${typeMap[_selectedType]}"
-            "&keyword=$_selectedType" // ←ここで「小児科」などを直接指定！
-            "&language=ja"
-            "&key=$apiKey";
+      final placesUrl =
+          "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+          "?location=$lat,$lng"
+          "&radius=1500"
+          "&type=${typeMap[_selectedType]}"
+          "&keyword=$_selectedType" // ←ここで「小児科」などを直接指定！
+          "&language=ja"
+          "&key=$apiKey";
 
       final placesResponse = await http.get(Uri.parse(placesUrl));
       final placesData = json.decode(placesResponse.body);
@@ -136,9 +136,8 @@ class _SearchScreenState extends State<SearchScreen> {
       places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
 
       setState(() {
-      _places = places.cast<Map<String, dynamic>>();
+        _places = places.cast<Map<String, dynamic>>();
       });
-
     }
   }
 
@@ -162,7 +161,9 @@ class _SearchScreenState extends State<SearchScreen> {
             // TextFieldはテキスト入力フィールドを作成するウィジェッÏト
             TextField(
               controller: _stationController,
-              decoration: const InputDecoration(labelText: AppStrings.searchHint),
+              decoration: const InputDecoration(
+                labelText: AppStrings.searchHint,
+              ),
             ),
 
             // 余白を作るためのウィジェット
@@ -198,7 +199,10 @@ class _SearchScreenState extends State<SearchScreen> {
             // ElevatedButtonは押せるボタンを作成するウィジェット
             // onPressedはボタンが押されたときの処理を指定するためのプロパティ
             // ここがトリガーになることで処理を実施される
-            ElevatedButton(onPressed: searchPlaces, child: const Text(AppStrings.searchButton)),
+            ElevatedButton(
+              onPressed: searchPlaces,
+              child: const Text(AppStrings.searchButton),
+            ),
 
             // スペースをできるだけ広く使ってくれるウィジェット→残ったスペースを使って行う
             // リストを表示させてスクロールできるようにするためのウィジェット
@@ -207,9 +211,26 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemCount: _places.length,
                 itemBuilder: (context, index) {
                   final place = _places[index];
+
+                  // ListTileはリストの1行を作成するためのウィジェット
                   return ListTile(
-                    title: Text(place['name']),
-                    subtitle: Text(place['vicinity']),
+
+                    // SelectableTextは選択可能なテキストを表示するためのウィジェット
+                    // place['name']は医療機関の名前を取得するためのプロパティ
+                    // nullの場合は「名称なし」と表示する
+                    title: SelectableText(place['name'] ?? '名称なし'),
+                    subtitle: Column(
+
+                      // crossAxisAlignmentは子ウィジェットの配置を指定するためのプロパティ
+                      // CrossAxisAlignment.startは左寄せにするためのプロパティ
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SelectableText(place['vicinity'] ?? '住所なし'),
+                        SelectableText(
+                          '評価: ${place['rating']?.toString() ?? 'なし'}（${place['user_ratings_total'] ?? 0}件）',
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
