@@ -98,7 +98,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
     // HTTPGETリクエストするためのURLを作成
     final geocodeUrl =
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$station&key=$apiKey";
+        "https://maps.googleapis.com/maps/api/geocode/json?address=$station&language=ja&key=$apiKey";
 
     // 非同期処理にてリクエストの実施を定義
     // Uri.parse(geocodeUrl)	→URLとして解析する（文字列になっているものをURLオブジェクトとして解析）
@@ -120,14 +120,25 @@ class _SearchScreenState extends State<SearchScreen> {
         '整形外科': 'doctor',
       };
 
-      final placesUrl =
-          "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=$lat,$lng&radius=1500&type=${typeMap[_selectedType]}&key=$apiKey";
+        final placesUrl =
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+            "?location=$lat,$lng"
+            "&radius=1500"
+            "&type=${typeMap[_selectedType]}"
+            "&keyword=$_selectedType" // ←ここで「小児科」などを直接指定！
+            "&language=ja"
+            "&key=$apiKey";
+
       final placesResponse = await http.get(Uri.parse(placesUrl));
       final placesData = json.decode(placesResponse.body);
 
+      final places = (placesData['results'] ?? []) as List;
+      places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
+
       setState(() {
-        _places = List<Map<String, dynamic>>.from(placesData['results'] ?? []);
+      _places = places.cast<Map<String, dynamic>>();
       });
+
     }
   }
 
@@ -148,7 +159,7 @@ class _SearchScreenState extends State<SearchScreen> {
         // childrenはColumnの子ウィジェットを指定するためのプロパティ
         child: Column(
           children: [
-            // TextFieldはテキスト入力フィールドを作成するウィジェット
+            // TextFieldはテキスト入力フィールドを作成するウィジェッÏト
             TextField(
               controller: _stationController,
               decoration: const InputDecoration(labelText: AppStrings.searchHint),
