@@ -214,13 +214,11 @@ class _SearchScreenState extends State<SearchScreen> {
 
                   // ListTileはリストの1行を作成するためのウィジェット
                   return ListTile(
-
                     // SelectableTextは選択可能なテキストを表示するためのウィジェット
                     // place['name']は医療機関の名前を取得するためのプロパティ
                     // nullの場合は「名称なし」と表示する
                     title: SelectableText(place['name'] ?? '名称なし'),
                     subtitle: Column(
-
                       // crossAxisAlignmentは子ウィジェットの配置を指定するためのプロパティ
                       // CrossAxisAlignment.startは左寄せにするためのプロパティ
                       crossAxisAlignment: CrossAxisAlignment.start,
