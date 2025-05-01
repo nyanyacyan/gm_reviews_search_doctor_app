@@ -47,3 +47,4 @@ app.*.map.json
 
 # 秘密鍵と公開鍵の署名ファイル
 android/my-release-key.jks
+key.properties
