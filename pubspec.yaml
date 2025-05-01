@@ -26,6 +26,7 @@ dependencies:
 
 # 開発中のテスト・分析用パッケージ
 dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
@@ -37,4 +38,10 @@ flutter:
   # アセットの設定→ビルドに含めてもらうように設定
   assets:
     - .env
+
+# iconの設定
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
 
