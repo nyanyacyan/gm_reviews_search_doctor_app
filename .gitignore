@@ -44,3 +44,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# 秘密鍵と公開鍵の署名ファイル
+android/my-release-key.jks
