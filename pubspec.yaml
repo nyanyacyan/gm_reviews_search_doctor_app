@@ -38,6 +38,8 @@ flutter:
   # アセットの設定→ビルドに含めてもらうように設定
   assets:
     - .env
+    - assets/icon/app_icon.png
+    - assets/no_image_photo.png
 
 # iconの設定
 flutter_icons:

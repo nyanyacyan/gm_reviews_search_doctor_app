@@ -129,14 +129,39 @@ class _SearchScreenState extends State<SearchScreen> {
           "&language=ja"
           "&key=$apiKey";
 
+      // HTTPGETリクエストするためのURLを作成
       final placesResponse = await http.get(Uri.parse(placesUrl));
+
+      // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
       final placesData = json.decode(placesResponse.body);
 
       final places = (placesData['results'] ?? []) as List;
       places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
 
+      // setState()は状態を更新するためのメソッド
+      // setState(() { })の中に状態を更新する処理を書くことで、UIが再描画される
       setState(() {
-        _places = places.cast<Map<String, dynamic>>();
+        _places =
+            // placesData['results']は医療機関の情報を格納したリスト
+            // (placesData['results'] ?? []) as Listはnullの場合は空のリストを返す
+            // as Listは型を指定するためのキーワード（resultの中身はリストになっている）
+            // placeはplacesData['results']の中の1つの要素（病院1件分のデータ）
+            (placesData['results'] as List).map((place) {
+              final hospitalPhoto = place['photos']?[0]['photo_reference'];
+              final photoUrl =
+                  hospitalPhoto != null
+                      ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$hospitalPhoto&key=$apiKey"
+                      : null;
+
+              return {
+                'name': place['name'],
+                'vicinity': place['vicinity'],
+                'rating': place['rating'],
+                'user_ratings_total': place['user_ratings_total'],
+                'photoUrl': photoUrl,
+              };
+              // .toList()はリストを作成するためのメソッド
+            }).toList();
       });
     }
   }
@@ -213,21 +238,72 @@ class _SearchScreenState extends State<SearchScreen> {
                   final place = _places[index];
 
                   // ListTileはリストの1行を作成するためのウィジェット
-                  return ListTile(
-                    // SelectableTextは選択可能なテキストを表示するためのウィジェット
-                    // place['name']は医療機関の名前を取得するためのプロパティ
-                    // nullの場合は「名称なし」と表示する
-                    title: SelectableText(place['name'] ?? '名称なし'),
-                    subtitle: Column(
-                      // crossAxisAlignmentは子ウィジェットの配置を指定するためのプロパティ
-                      // CrossAxisAlignment.startは左寄せにするためのプロパティ
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SelectableText(place['vicinity'] ?? '住所なし'),
-                        SelectableText(
-                          '評価: ${place['rating']?.toString() ?? 'なし'}（${place['user_ratings_total'] ?? 0}件）',
-                        ),
-                      ],
+                  return Card(
+                    elevation: 2,
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+
+                        children: [
+                          // 画像を表示するウィジェット
+                          if (place['photoUrl'] != null)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                place['photoUrl'],
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          else
+                            // 画像がない場合はデフォルトの画像を表示する
+                            Image.asset(
+                              'assets/no_image_photo.png',
+                              width: 80,
+                              height: 80,
+                              color: Colors.grey[300],
+                            ),
+
+                          const SizedBox(width: 8),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 病院名を表示するウィジェット
+                                SelectableText(
+                                  place['name'] ?? '名称なし',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+
+                                // 余白を作るためのウィジェット
+                                const SizedBox(height: 4),
+
+                                // 住所を表示するウィジェット
+                                SelectableText(
+                                  place['vicinity'] ?? '住所登録なし',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+
+                                // 余白を作るためのウィジェット
+                                const SizedBox(height: 4),
+
+                                // 評価を表示するウィジェット
+                                SelectableText(
+                                  '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 },
