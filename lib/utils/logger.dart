@@ -17,12 +17,13 @@ Future<DailyFileLogOutput> setupLogger() async {
   // Loggerクラスの各設定にカスタマイズを反映
   // printerは出力のフォーマットを指定
   // outputは出力先を指定
+  // ConsoleOutputは、ターミナルなどでの背景色を変更するために使用
   logger = Logger(
     level: Level.debug,
-    printer: CustomLogPrinter(),
+    printer: CustomLogPrinter(),  // CustomLogPrinterクラスを使用
     output: MultiOutput([
       ConsoleOutput(),
-      fileOutput,
+      fileOutput,  // DailyFileLogOutputクラスを使用
     ]),
   );
   return fileOutput;
