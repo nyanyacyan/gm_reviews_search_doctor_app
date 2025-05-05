@@ -6,6 +6,8 @@ class AppStrings {
   static const String searchHint = '駅名を入力してください';
   static const String dropDownSelectHint = '希望の診療科を選択してください';
   static const String searchButton = '検索';
+  static const String textMapButton = 'GoogleMapで開く';
+
 }
 
 

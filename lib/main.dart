@@ -6,6 +6,8 @@
 // cupertino.dart → iOS風のUI部品
 // material.dart → Android風のUI部品
 // Androidもiosの両方使う場合にはmaterial.dartを使うのが一般的
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 // APIリクエストするためのライブラリ
@@ -22,6 +24,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // strings.dartは文字列を定義するためのファイル
 import 'package:gm_reviews_search_doctor_app/strings.dart';
 
+
+import 'package:url_launcher/url_launcher.dart';
 // アプリの起動時に最初に呼ばれる関数
 // どこに書いてもいいが慣習としては先頭に記述
 Future<void> main() async {
@@ -286,8 +290,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               borderRadius: BorderRadius.circular(8),
                               child: Image.network(
                                 place['photoUrl'],
-                                width: 80,
-                                height: 80,
+                                width: 100,
+                                height: 100,
                                 fit: BoxFit.cover,
                               ),
                             )
@@ -295,8 +299,8 @@ class _SearchScreenState extends State<SearchScreen> {
                             // 画像がない場合はデフォルトの画像を表示する
                             Image.asset(
                               'assets/no_image_photo.png',
-                              width: 80,
-                              height: 80,
+                              width: 100,
+                              height: 100,
                               color: Colors.grey[300],
                             ),
 
@@ -320,19 +324,31 @@ class _SearchScreenState extends State<SearchScreen> {
                                 // 余白を作るためのウィジェット
                                 const SizedBox(height: 4),
 
-                                // 住所を表示するウィジェット
+                                // 評価を表示するウィジェット
                                 SelectableText(
-                                  place['vicinity'] ?? '住所登録なし',
+                                  '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
                                   style: const TextStyle(fontSize: 14),
                                 ),
 
                                 // 余白を作るためのウィジェット
                                 const SizedBox(height: 4),
 
-                                // 評価を表示するウィジェット
+                                // 住所を表示するウィジェット
                                 SelectableText(
-                                  '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
+                                  place['vicinity'] ?? '住所登録なし',
                                   style: const TextStyle(fontSize: 14),
+                                ),
+
+                                // 地図アプリへジャンプするためのウィジェット
+                                TextButton(
+                                  onPressed: (){
+                                    final lat = place['lat'];
+                                    final lng = place['lng'];
+                                    final url =
+                                        'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
+                                    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                  },
+                                  child: const Text(AppStrings.textMapButton),
                                 ),
                               ], // Column.children
                             ),
