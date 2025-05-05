@@ -24,12 +24,15 @@ class MapAppSwitchButton extends StatelessWidget {
 
   /// Googleマップを開く
   void _openGoogleMap(BuildContext context, double lat, double lng) async {
+    final messenger = ScaffoldMessenger.of(context);
+
     logger.d('Googleマップを開く');
     final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      logger.e('Googleマップを開けませんでした');
+      messenger.showSnackBar(
         const SnackBar(content: Text('地図を開けませんでした')),
       );
     }
@@ -39,7 +42,7 @@ class MapAppSwitchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => _openGoogleMap(context),
+      onPressed: () => _openGoogleMap(context, lat, lng),
       child: Text(label),
     );
   }
