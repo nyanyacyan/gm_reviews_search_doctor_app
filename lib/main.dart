@@ -6,7 +6,7 @@
 // cupertino.dart → iOS風のUI部品
 // material.dart → Android風のUI部品
 // Androidもiosの両方使う場合にはmaterial.dartを使うのが一般的
-import 'dart:math';
+// import 'dart:math';
 
 import 'package:flutter/material.dart';
 
