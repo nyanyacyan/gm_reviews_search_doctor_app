@@ -74,7 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // 変数名は小文字から始めるのが一般的でキャメルケースで定義するのが一般的
   final TextEditingController _stationController = TextEditingController();
 
-  String _selectedType = '小児科';
+  String? _selectedType = null;
 
   // Mapは辞書データ dynamic型は全ての型を受け入れることができる
   // _placesは医療機関の情報を格納するための変数
@@ -183,43 +183,71 @@ class _SearchScreenState extends State<SearchScreen> {
         // childrenはColumnの子ウィジェットを指定するためのプロパティ
         child: Column(
           children: [
-            // TextFieldはテキスト入力フィールドを作成するウィジェッÏト
-            TextField(
-              controller: _stationController,
-              decoration: const InputDecoration(
-                labelText: AppStrings.searchHint,
+            // TextFieldはテキスト入力フィールドを作成するためのウィジェット
+            SizedBox(
+              width: 300, // 幅を調整
+              child: TextField(
+                controller: _stationController,
+                decoration: const InputDecoration(
+                  labelText: AppStrings.searchHint,
+                ),
               ),
             ),
 
             // 余白を作るためのウィジェット
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 32.0),
 
-            // DropdownButtonはドロップダウンリストを作成するウィジェット
-            DropdownButton<String>(
-              value: _selectedType,
-              items:
-                  <String>[
-                    '小児科',
-                    '内科',
-                    '耳鼻科',
-                    '眼科',
-                    '皮膚科',
-                    '整形外科',
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  _selectedType = newValue!;
-                });
-              },
-            ),
+            Center(
+              child: SizedBox(
+                width: 300, // 幅を調整
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '希望の診療科を選択してください',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+
+                    // DropdownButtonはドロップダウンリストを作成するウィジェット
+                    DropdownButton<String>(
+                      value: _selectedType,
+                      isExpanded: true,
+
+                      // hintはドロップダウンリストの初期表示を指定するためのプロパティ
+                      hint: const Text(
+                        AppStrings.dropDownSelectHint,
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      items: <String>[
+                        '小児科',
+                        '内科',
+                        '耳鼻科',
+                        '眼科',
+                        '皮膚科',
+                        '整形外科',
+                        '歯科',
+                      ].map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Center(child: Text(value)),
+                        );
+                      }).toList(),
+
+                      // hintはドロップダウンリストの初期表示を指定するためのプロパティ
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedType = newValue!;
+                        }); // _selectedTypeに選択された値を代入する
+                      }, // onChanged
+                    ), // DropdownButton
+                  ], // Column.children
+                ),
+              ),
+            ), // Center
+
 
             // 余白を作るためのウィジェット
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 32.0),
 
             // ElevatedButtonは押せるボタンを作成するウィジェット
             // onPressedはボタンが押されたときの処理を指定するためのプロパティ
@@ -228,6 +256,9 @@ class _SearchScreenState extends State<SearchScreen> {
               onPressed: searchPlaces,
               child: const Text(AppStrings.searchButton),
             ),
+
+            // 余白を作るためのウィジェット
+            const SizedBox(height: 16.0),
 
             // スペースをできるだけ広く使ってくれるウィジェット→残ったスペースを使って行う
             // リストを表示させてスクロールできるようにするためのウィジェット
@@ -246,6 +277,8 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
 
+                        // Rowは横にウィジェットを並べるためのウィジェット
+                        // childrenはRowの子ウィジェットを指定するためのプロパティ
                         children: [
                           // 画像を表示するウィジェット
                           if (place['photoUrl'] != null)
@@ -267,8 +300,10 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: Colors.grey[300],
                             ),
 
+                          // 余白を作るためのウィジェット
                           const SizedBox(width: 8),
 
+                          // 画像の右側に病院名、住所、評価を表示するウィジェット
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,19 +334,19 @@ class _SearchScreenState extends State<SearchScreen> {
                                   '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
                                   style: const TextStyle(fontSize: 14),
                                 ),
-                              ],
+                              ], // Column.children
                             ),
                           ),
-                        ],
+                        ], //Row.children
                       ),
                     ),
                   );
-                },
+                }, // Child
               ),
             ),
-          ],
+          ], // Column.children
         ),
       ),
     );
-  }
+  } // build
 }
