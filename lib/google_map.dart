@@ -45,14 +45,21 @@ class MapAppSwitchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     logger.d('[描画] MapAppSwitchButton: lat=$lat, lng=$lng');
 
-    return TextButton(
-      style: TextButton.styleFrom(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return SizedBox(
+      width: 200,
+      child: TextButton(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          minimumSize: const Size.fromHeight(8),
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+        onPressed: () => _openGoogleMap(context, lat, lng),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
       ),
-      onPressed: () => _openGoogleMap(context, lat, lng),
-      child: Text(label),
     );
   }
 }
