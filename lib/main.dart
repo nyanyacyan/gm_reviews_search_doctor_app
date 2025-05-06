@@ -24,11 +24,19 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 // strings.dartは文字列を定義するためのファイル
 import 'package:gm_reviews_search_doctor_app/strings.dart';
 
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart'; // loggerのimport
+import 'package:gm_reviews_search_doctor_app/google_map.dart'; // Googleマップへのリンクボタンのimport
+// import 'package:url_launcher/url_launcher.dart';
 
-import 'package:url_launcher/url_launcher.dart';
 // アプリの起動時に最初に呼ばれる関数
 // どこに書いてもいいが慣習としては先頭に記述
 Future<void> main() async {
+  // WidgetsFlutterBindingはFlutterのウィジェットを初期化するためのクラス
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // setupLogger()はアプリケーションのロガーを初期化するための関数
+  await setupLogger();
+
   // dotenvを初期化する
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
@@ -133,7 +141,7 @@ class _SearchScreenState extends State<SearchScreen> {
           "&language=ja"
           "&key=$apiKey";
 
-      // HTTPGETリクエストするためのURLを作成
+      // httpGetリクエストするためのURLを作成
       final placesResponse = await http.get(Uri.parse(placesUrl));
 
       // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
@@ -163,6 +171,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 'rating': place['rating'],
                 'user_ratings_total': place['user_ratings_total'],
                 'photoUrl': photoUrl,
+                'lat': place['geometry']['location']['lat'], // ← 追加
+                'lng': place['geometry']['location']['lng'], // ← 追加
               };
               // .toList()はリストを作成するためのメソッド
             }).toList();
@@ -172,6 +182,8 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    logger.d('build()が呼ばれました: $_selectedType');
+
     // Scaffoldは画面の基本的なレイアウトを提供するウィジェット
     return Scaffold(
       // AppBarは画面の上部に表示されるバー
@@ -209,7 +221,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: [
                     const Text(
                       '希望の診療科を選択してください',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
 
                     // DropdownButtonはドロップダウンリストを作成するウィジェット
@@ -222,20 +237,21 @@ class _SearchScreenState extends State<SearchScreen> {
                         AppStrings.dropDownSelectHint,
                         style: TextStyle(color: Colors.grey),
                       ),
-                      items: <String>[
-                        '小児科',
-                        '内科',
-                        '耳鼻科',
-                        '眼科',
-                        '皮膚科',
-                        '整形外科',
-                        '歯科',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Center(child: Text(value)),
-                        );
-                      }).toList(),
+                      items:
+                          <String>[
+                            '小児科',
+                            '内科',
+                            '耳鼻科',
+                            '眼科',
+                            '皮膚科',
+                            '整形外科',
+                            '歯科',
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Center(child: Text(value)),
+                            );
+                          }).toList(),
 
                       // hintはドロップダウンリストの初期表示を指定するためのプロパティ
                       onChanged: (String? newValue) {
@@ -248,8 +264,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
             ), // Center
-
-
             // 余白を作るためのウィジェット
             const SizedBox(height: 32.0),
 
@@ -340,16 +354,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ),
 
                                 // 地図アプリへジャンプするためのウィジェット
-                                TextButton(
-                                  onPressed: (){
-                                    final lat = place['lat'];
-                                    final lng = place['lng'];
-                                    final url =
-                                        'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-                                    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-                                  },
-                                  child: const Text(AppStrings.textMapButton),
-                                ),
+                                if (place['lat'] != null &&
+                                    place['lng'] != null)
+                                  MapAppSwitchButton(
+                                    lat: (place['lat'] as num).toDouble(),
+                                    lng: (place['lng'] as num).toDouble(),
+                                    label: AppStrings.textMapButton,
+                                  ),
                               ], // Column.children
                             ),
                           ),
