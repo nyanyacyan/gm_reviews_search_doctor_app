@@ -331,7 +331,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                   place['name'] ?? '名称なし',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    fontSize: 18,
                                   ),
                                 ),
 
@@ -352,6 +352,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                   place['vicinity'] ?? '住所登録なし',
                                   style: const TextStyle(fontSize: 14),
                                 ),
+
+                                // 余白を作るためのウィジェット
+                                const SizedBox(height: 4),
 
                                 // 地図アプリへジャンプするためのウィジェット
                                 if (place['lat'] != null &&
