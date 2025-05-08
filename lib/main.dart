@@ -23,7 +23,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // strings.dartは文字列を定義するためのファイル
 import 'package:gm_reviews_search_doctor_app/strings.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart'; // loggerのimport
 import 'package:gm_reviews_search_doctor_app/google_map.dart'; // Googleマップへのリンクボタンのimport
 // import 'package:url_launcher/url_launcher.dart';
@@ -171,8 +171,9 @@ class _SearchScreenState extends State<SearchScreen> {
                 'rating': place['rating'],
                 'user_ratings_total': place['user_ratings_total'],
                 'photoUrl': photoUrl,
-                'lat': place['geometry']['location']['lat'], // ← 追加
-                'lng': place['geometry']['location']['lng'], // ← 追加
+                'lat': place['geometry']['location']['lat'],
+                'lng': place['geometry']['location']['lng'],
+                'place_id': place['place_id'],
               };
               // .toList()はリストを作成するためのメソッド
             }).toList();
@@ -285,6 +286,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemCount: _places.length,
                 itemBuilder: (context, index) {
                   final place = _places[index];
+                  logger.d(place);
 
                   // ListTileはリストの1行を作成するためのウィジェット
                   return Card(
@@ -324,16 +326,44 @@ class _SearchScreenState extends State<SearchScreen> {
                           // 画像の右側に病院名、住所、評価を表示するウィジェット
                           Expanded(
                             child: Column(
+
+                              // crossAxisAlignmentは横方向の配置を指定するためのプロパティ
+                              // CrossAxisAlignment.startは左寄せにするためのプロパティ
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // 病院名を表示するウィジェット
-                                SelectableText(
-                                  place['name'] ?? '名称なし',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                // 病院名をリンク付きor通常表示
+                                // リンク付きのテキストを表示するウィジェット
+                                // Tooltipは長押しで説明を表示するためのウィジェット
+                                // messageは説明文を指定するためのプロパティ
+                                // place['website']がnullでない場合はリンク付きのテキストを表示する
+                                // place['website']がnullの場合は通常のテキストを表示する
+                                Tooltip(
+                                  message: '公式サイトまたはGoogleマップを開く',
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final placeId = place['place_id'];
+                                      final url = await fetchWebsiteOrFallback(placeId);
+                                      if (!context.mounted) return;
+                                      if (await canLaunchUrl(url)) {
+                                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('リンクを開けませんでした')),
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      place['name'] ?? '名称なし',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
                                   ),
                                 ),
+
 
                                 // 余白を作るためのウィジェット
                                 const SizedBox(height: 4),
@@ -359,6 +389,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                 // 地図アプリへジャンプするためのウィジェット
                                 if (place['lat'] != null &&
                                     place['lng'] != null)
+
+                                // 地図アプリへジャンプするためのウィジェット
+                                // MapAppSwitchButtonはGoogleマップを開くためのボタン
+                                // AppStrings.textMapButtonはボタンのラベルを指定するためのプロパティ
                                   MapAppSwitchButton(
                                     lat: (place['lat'] as num).toDouble(),
                                     lng: (place['lng'] as num).toDouble(),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/strings.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';  // envファイルの読み込み
+import 'package:http/http.dart' as http;  // APIリクエストするためのライブラリ
+
 
 //! ------------------------------------------------------------
 /// Googleマップへのリンクボタン→アプリがない場合にはブラウザにてGoogleマップを開く
@@ -40,6 +44,7 @@ class MapAppSwitchButton extends StatelessWidget {
     }
   }
 
+
   /// Googleマップを開くボタン
   @override
   Widget build(BuildContext context) {
@@ -63,3 +68,21 @@ class MapAppSwitchButton extends StatelessWidget {
     );
   }
 }
+
+class MapRequestDetails {}
+  Future<Uri> fetchWebsiteOrFallback(String placeId) async {
+    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
+    final detailsUrl =
+        'https://maps.googleapis.com/maps/api/place/details/json'
+        '?place_id=$placeId&fields=website&key=$apiKey';
+
+    final res = await http.get(Uri.parse(detailsUrl));
+    if (res.statusCode == 200) {
+      final data = json.decode(res.body);
+      final website = data['result']?['website'];
+      if (website != null) return Uri.parse(website);
+    }
+
+    // fallback to Google Maps detail page
+    return Uri.parse('https://www.google.com/maps/place/?q=place_id=$placeId');
+  }
