@@ -10,3 +10,9 @@ class AppStrings {
 }
 
 
+class WidgetStrings {
+  static const String searchButton = '検索';
+  static const String mapButton = 'GoogleMapで開く';
+  static const String noData = 'データがありません';
+  static const String errorMessage = 'エラーが発生しました';
+}
