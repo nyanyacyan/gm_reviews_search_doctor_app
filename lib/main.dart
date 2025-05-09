@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '駅チカ 名医リサーチ | 口コミランキング',
+      title: '口コミドクター',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
       ),
@@ -86,7 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // 変数名は小文字から始めるのが一般的でキャメルケースで定義するのが一般的
   final TextEditingController _stationController = TextEditingController();
 
-  String? _selectedType = null;
+  String? _selectedType = '小児科';
 
   // Mapは辞書データ dynamic型は全ての型を受け入れることができる
   // _placesは医療機関の情報を格納するための変数
@@ -98,92 +98,105 @@ class _SearchScreenState extends State<SearchScreen> {
   // searchPlaces()	関数の名前。「検索するよ」って意味の関数名
   // async	「時間がかかる処理だよ！」と教える魔法の言葉
   Future<void> searchPlaces() async {
-    // .trim()	前後の空白を取り除く（スペースや改行を消してくれる）
-    final station = _stationController.text.trim();
+    logger.d('searchPlaces()が呼ばれました: $_selectedType');
+    try {
+      // .trim()	前後の空白を取り除く（スペースや改行を消してくれる）
+      final station = _stationController.text.trim();
 
-    // stationが空文字かどうかをチェックする
-    // isEmptyは空文字を示す
-    if (station.isEmpty) return;
+      // stationが空文字かどうかをチェックする
+      // isEmptyは空文字を示す
+      if (station.isEmpty) return;
 
-    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
-    print('API Key: $apiKey');
+      final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
 
-    // HTTPGETリクエストするためのURLを作成
-    final geocodeUrl =
-        "https://maps.googleapis.com/maps/api/geocode/json?address=$station&language=ja&key=$apiKey";
+      // httpGETリクエストするためのURLを作成
+      final geocodeUrl =
+          "https://maps.googleapis.com/maps/api/geocode/json?address=$station&language=ja&key=$apiKey";
 
-    // 非同期処理にてリクエストの実施を定義
-    // Uri.parse(geocodeUrl)	→URLとして解析する（文字列になっているものをURLオブジェクトとして解析）
-    final geocodeResponse = await http.get(Uri.parse(geocodeUrl));
-
-    // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
-    final geocodeData = json.decode(geocodeResponse.body);
-
-    if (geocodeData['status'] == "OK") {
-      final lat = geocodeData['results'][0]['geometry']['location']['lat'];
-      final lng = geocodeData['results'][0]['geometry']['location']['lng'];
-
-      final typeMap = {
-        '小児科': 'doctor',
-        '内科': 'doctor',
-        '耳鼻科': 'doctor',
-        '眼科': 'doctor',
-        '皮膚科': 'doctor',
-        '整形外科': 'doctor',
-      };
-
-      final placesUrl =
-          "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
-          "?location=$lat,$lng"
-          "&radius=1500"
-          "&type=${typeMap[_selectedType]}"
-          "&keyword=$_selectedType" // ←ここで「小児科」などを直接指定！
-          "&language=ja"
-          "&key=$apiKey";
-
-      // httpGetリクエストするためのURLを作成
-      final placesResponse = await http.get(Uri.parse(placesUrl));
+      // 非同期処理にてリクエストの実施を定義
+      // Uri.parse(geocodeUrl)	→URLとして解析する（文字列になっているものをURLオブジェクトとして解析）
+      final geocodeResponse = await http.get(Uri.parse(geocodeUrl));
 
       // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
-      final placesData = json.decode(placesResponse.body);
+      final geocodeData = json.decode(geocodeResponse.body);
 
-      final places = (placesData['results'] ?? []) as List;
-      places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
+      if (geocodeData['status'] == "OK") {
+        final lat = geocodeData['results'][0]['geometry']['location']['lat'];
+        final lng = geocodeData['results'][0]['geometry']['location']['lng'];
 
-      // setState()は状態を更新するためのメソッド
-      // setState(() { })の中に状態を更新する処理を書くことで、UIが再描画される
-      setState(() {
-        _places =
-            // placesData['results']は医療機関の情報を格納したリスト
-            // (placesData['results'] ?? []) as Listはnullの場合は空のリストを返す
-            // as Listは型を指定するためのキーワード（resultの中身はリストになっている）
-            // placeはplacesData['results']の中の1つの要素（病院1件分のデータ）
-            (placesData['results'] as List).map((place) {
-              final hospitalPhoto = place['photos']?[0]['photo_reference'];
-              final photoUrl =
-                  hospitalPhoto != null
-                      ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$hospitalPhoto&key=$apiKey"
-                      : null;
+        final typeMap = {
+          '小児科': 'doctor',
+          '内科': 'doctor',
+          '耳鼻科': 'doctor',
+          '眼科': 'doctor',
+          '皮膚科': 'doctor',
+          '整形外科': 'doctor',
+        };
 
-              return {
-                'name': place['name'],
-                'vicinity': place['vicinity'],
-                'rating': place['rating'],
-                'user_ratings_total': place['user_ratings_total'],
-                'photoUrl': photoUrl,
-                'lat': place['geometry']['location']['lat'],
-                'lng': place['geometry']['location']['lng'],
-                'place_id': place['place_id'],
-              };
-              // .toList()はリストを作成するためのメソッド
-            }).toList();
-      });
+        final placesUrl =
+            "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+            "?location=$lat,$lng"
+            "&radius=1500"
+            "&type=${typeMap[_selectedType]}"
+            "&keyword=$_selectedType" // ←ここで「小児科」などを直接指定！
+            "&language=ja"
+            "&key=$apiKey";
+
+        // httpGetリクエストするためのURLを作成
+        final placesResponse = await http.get(Uri.parse(placesUrl));
+
+        // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
+        final placesData = json.decode(placesResponse.body);
+
+        final places = (placesData['results'] ?? []) as List;
+        places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
+
+        // setState()は状態を更新するためのメソッド
+        // setState(() { })の中に状態を更新する処理を書くことで、UIが再描画される
+        setState(() {
+          _places =
+              // placesData['results']は医療機関の情報を格納したリスト
+              // (placesData['results'] ?? []) as Listはnullの場合は空のリストを返す
+              // as Listは型を指定するためのキーワード（resultの中身はリストになっている）
+              // placeはplacesData['results']の中の1つの要素（病院1件分のデータ）
+              (placesData['results'] as List).map((place) {
+                final hospitalPhoto = place['photos']?[0]['photo_reference'];
+                final photoUrl =
+                    hospitalPhoto != null
+                        ? "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$hospitalPhoto&key=$apiKey"
+                        : null;
+
+                return {
+                  'name': place['name'],
+                  'vicinity': place['vicinity'],
+                  'rating': place['rating'],
+                  'user_ratings_total': place['user_ratings_total'],
+                  'photoUrl': photoUrl,
+                  'lat': place['geometry']['location']['lat'],
+                  'lng': place['geometry']['location']['lng'],
+                  'place_id': place['place_id'],
+                };
+                // .toList()はリストを作成するためのメソッド
+              }).toList();
+        });
+      } else {
+        // エラーハンドリング
+        logger.e('Geocode API Error: ${geocodeData['status']}');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('位置情報の取得に失敗しました')));
+      }
+    } catch (e, stackTrace) {
+      // エラーハンドリング
+      logger.e('処理中にエラーが発生いたしました: $e');
+      logger.e('StackTrace: $stackTrace');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     logger.d('build()が呼ばれました: $_selectedType');
+    try {
 
     // Scaffoldは画面の基本的なレイアウトを提供するウィジェット
     return Scaffold(
@@ -326,7 +339,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           // 画像の右側に病院名、住所、評価を表示するウィジェット
                           Expanded(
                             child: Column(
-
                               // crossAxisAlignmentは横方向の配置を指定するためのプロパティ
                               // CrossAxisAlignment.startは左寄せにするためのプロパティ
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,18 +350,30 @@ class _SearchScreenState extends State<SearchScreen> {
                                 // place['website']がnullでない場合はリンク付きのテキストを表示する
                                 // place['website']がnullの場合は通常のテキストを表示する
                                 (place['place_id'] != null)
-                                  ? Tooltip(
+                                    ? Tooltip(
                                       message: '公式サイトまたはGoogleマップを開く',
                                       child: GestureDetector(
                                         onTap: () async {
                                           final placeId = place['place_id'];
-                                          final url = await fetchWebsiteOrFallback(placeId);
+                                          final url =
+                                              await fetchWebsiteOrFallback(
+                                                placeId,
+                                              );
                                           if (!context.mounted) return;
                                           if (await canLaunchUrl(url)) {
-                                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                                            await launchUrl(
+                                              url,
+                                              mode:
+                                                  LaunchMode
+                                                      .externalApplication,
+                                            );
                                           } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('リンクを開けませんでした')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('リンクを開けませんでした'),
+                                              ),
                                             );
                                           }
                                         },
@@ -359,12 +383,13 @@ class _SearchScreenState extends State<SearchScreen> {
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18,
                                             color: Colors.blue,
-                                            decoration: TextDecoration.underline,
+                                            decoration:
+                                                TextDecoration.underline,
                                           ),
                                         ),
                                       ),
                                     )
-                                  : SelectableText(
+                                    : SelectableText(
                                       place['name'] ?? '名称なし',
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
@@ -396,10 +421,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                 // 地図アプリへジャンプするためのウィジェット
                                 if (place['lat'] != null &&
                                     place['lng'] != null)
-
-                                // 地図アプリへジャンプするためのウィジェット
-                                // MapAppSwitchButtonはGoogleマップを開くためのボタン
-                                // AppStrings.textMapButtonはボタンのラベルを指定するためのプロパティ
+                                  // 地図アプリへジャンプするためのウィジェット
+                                  // MapAppSwitchButtonはGoogleマップを開くためのボタン
+                                  // AppStrings.textMapButtonはボタンのラベルを指定するためのプロパティ
                                   MapAppSwitchButton(
                                     lat: (place['lat'] as num).toDouble(),
                                     lng: (place['lng'] as num).toDouble(),
@@ -419,5 +443,12 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       ),
     );
-  } // build
+  } catch (e, stack) {
+      // エラーハンドリング
+      logger.e('処理中にエラーが発生いたしました: $e');
+      logger.e('StackTrace: $stack');
+      return const Center(child: Text('UIの描画中にエラーが発生しました'));
+
+    }
+  }
 }
