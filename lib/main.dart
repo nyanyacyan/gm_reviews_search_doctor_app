@@ -113,9 +113,21 @@ class _SearchScreenState extends State<SearchScreen> {
       final geocodeUrl =
           "https://maps.googleapis.com/maps/api/geocode/json?address=$station&language=ja&key=$apiKey";
 
-      // 非同期処理にてリクエストの実施を定義
-      // Uri.parse(geocodeUrl)	→URLとして解析する（文字列になっているものをURLオブジェクトとして解析）
-      final geocodeResponse = await http.get(Uri.parse(geocodeUrl));
+
+      // http.ResponseはHTTPリクエストのレスポンスを表すクラス
+      http.Response geocodeResponse;
+      try {
+        // http.get()はHTTP GETリクエストを送るためのメソッド
+        geocodeResponse = await http.get(Uri.parse(geocodeUrl));
+      } catch (e, stackTrace) {
+        logger.e('Geocode API リクエストに失敗しました: $e');
+        logger.e('StackTrace: $stackTrace');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('通信エラーが発生しました（位置情報取得）')),
+        );
+        return;
+      }
 
       // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
       final geocodeData = json.decode(geocodeResponse.body);
