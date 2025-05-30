@@ -55,6 +55,8 @@ class MapAppSwitchButton extends StatelessWidget {
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
         ),
+
+        // 同じクラス内の場合にはそのまま記述できる
         onPressed: () => _openGoogleMap(context),
         child: Text(
           label,

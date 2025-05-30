@@ -1,6 +1,7 @@
 import 'dart:convert' show json;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 // **********************************************************************************
 //? gm_placeへのリクエストを行うクラス
@@ -18,6 +19,8 @@ class GMPlaceRequest {
     final res = await http.get(Uri.parse(detailsUrl));
     if (res.statusCode == 200) {
       final data = json.decode(res.body);
+      logger.d('APIのレスポンス: ${data}'); // レスポンスのログ出力
+
       final website = data['result']?['website'];
       if (website != null) return Uri.parse(website);
     }
