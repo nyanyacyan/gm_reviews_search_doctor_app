@@ -16,3 +16,5 @@ class WidgetStrings {
   static const String noData = 'データがありません';
   static const String errorMessage = 'エラーが発生しました';
 }
+
+
