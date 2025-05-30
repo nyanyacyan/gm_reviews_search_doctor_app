@@ -48,3 +48,7 @@ app.*.map.json
 # 秘密鍵と公開鍵の署名ファイル
 key.properties
 keystore/*.jks
+
+
+# API Keys掲載場所
+*AndroidManifest.xml
