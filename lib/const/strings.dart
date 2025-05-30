@@ -2,6 +2,7 @@
 
 class AppStrings {
   // static const →どこからでも呼び出せる定数
+  static const String materialTitle = '口コミドクター';
   static const String appTitle = '口コミドクター';
   static const String searchHint = '駅名を入力してください';
   static const String dropDownSelectHint = '希望の診療科を選択してください';

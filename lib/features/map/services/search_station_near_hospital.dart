@@ -39,7 +39,7 @@ class NearbySearchService {
     logger.d('rawResultsの型: ${rawResults.runtimeType}'); // dynamic か List?
 
     // 2. Listとして扱えるように変換
-    final List<dynamic> resultList = rawResults as List;  // as List<dynamic> を使用して型変換（あっているのであれば明示）
+    final List<dynamic> resultList = rawResults as List;  // json.decodeした際にはこの箇所で as List<dynamic>にて明示する必要がある
     logger.d('resultList数: ${resultList.length}');
     logger.d('resultListの1件目: ${resultList.isNotEmpty ? resultList[0] : '空リスト'}');
 

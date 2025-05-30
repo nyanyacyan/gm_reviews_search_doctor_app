@@ -1,6 +1,6 @@
 // ここには、選択肢の値を定義します。
 class SelectValue {
-  static const Map<String, String> keyword = {
+  static const Map<String, String> medicalTypeMap = {
     '小児科': 'doctor',
     '内科': 'doctor',
     '耳鼻科': 'doctor',
