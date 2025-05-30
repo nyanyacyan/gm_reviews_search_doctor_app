@@ -22,10 +22,12 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 // strings.dartは文字列を定義するためのファイル
-import 'package:gm_reviews_search_doctor_app/strings.dart';
+import 'package:gm_reviews_search_doctor_app/const/strings.dart';
+import 'package:gm_reviews_search_doctor_app/data/dummy_data/err.dart'; // エラー時のダミーデータのインポート
+import 'package:gm_reviews_search_doctor_app/data/dummy_data/empty.dart'; // 空データのダミーデータのインポート
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart'; // loggerのimport
-import 'package:gm_reviews_search_doctor_app/google_map.dart'; // Googleマップへのリンクボタンのimport
+import 'package:gm_reviews_search_doctor_app/features/map/map_switch_btn.dart'; // Googleマップへのリンクボタンのimport
 // import 'package:url_launcher/url_launcher.dart';
 
 // アプリの起動時に最初に呼ばれる関数
@@ -107,34 +109,47 @@ class _SearchScreenState extends State<SearchScreen> {
       // isEmptyは空文字を示す
       if (station.isEmpty) return;
 
+
       final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
 
+      //? ここからgeocoding APIを使って、駅名から緯度経度を取得する処理を行う
       // httpGETリクエストするためのURLを作成
       final geocodeUrl =
           "https://maps.googleapis.com/maps/api/geocode/json?address=$station&language=ja&key=$apiKey";
 
+      // tryは基本範囲を厳選しているため変数をtry外にて利用したい場合にはtryの外にて型定義することによって初期化され、グローバル化できる
+      late String responseData;
+      String? _errMsg;
 
-      // http.ResponseはHTTPリクエストのレスポンスを表すクラス
-      http.Response geocodeResponse;
       try {
         // http.get()はHTTP GETリクエストを送るためのメソッド
-        geocodeResponse = await http.get(Uri.parse(geocodeUrl));
+        final response = await http.get(Uri.parse(geocodeUrl));
+        responseData = response.body;
+        // catchのみの場合は「Exception」と同義
       } catch (e, stackTrace) {
         logger.e('Geocode API リクエストに失敗しました: $e');
         logger.e('StackTrace: $stackTrace');
+
+        // もしリクエスト処理を実行中に画面の切替を行われた場合UI反映を中断させる
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('通信エラーが発生しました（位置情報取得）')),
-        );
+
+        setState(() {
+          _places = [DummyDataError.placeAPIError()];
+          _errMsg = 'APIリクエストに失敗しました（テスト中のため通信不可）';
+        });
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('通信エラーが発生しました（位置情報取得）')));
         return;
       }
 
       // レスポンスデータをJSON形式で取得（Dartで使えるように変換）
-      final geocodeData = json.decode(geocodeResponse.body);
+      final jsonDecodeData = json.decode(responseData);
 
-      if (geocodeData['status'] == "OK") {
-        final lat = geocodeData['results'][0]['geometry']['location']['lat'];
-        final lng = geocodeData['results'][0]['geometry']['location']['lng'];
+      if (jsonDecodeData['status'] == "OK") {
+        final lat = jsonDecodeData['results'][0]['geometry']['location']['lat'];
+        final lng = jsonDecodeData['results'][0]['geometry']['location']['lng'];
 
         final typeMap = {
           '小児科': 'doctor',
@@ -145,6 +160,8 @@ class _SearchScreenState extends State<SearchScreen> {
           '整形外科': 'doctor',
         };
 
+
+        // ここからGoogle Places APIを使って、緯度経度から医療機関の情報を取得する処理を行う
         final placesUrl =
             "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
             "?location=$lat,$lng"
@@ -161,6 +178,19 @@ class _SearchScreenState extends State<SearchScreen> {
         final placesData = json.decode(placesResponse.body);
 
         final places = (placesData['results'] ?? []) as List;
+
+        // 検索結果が0件の場合はダミーデータを表示する
+        if (places.isEmpty) {
+          logger.w('検索結果が0件でした。ダミーデータを表示します。');
+          setState(() {
+            _places = [DummyEmptyError.placeAPIEmpty()];
+            _errMsg = '該当する医療機関が見つかりませんでした';
+          });
+          ScaffoldMessenger.of( context, ).showSnackBar(const SnackBar(content: Text('該当する医療機関が見つかりませんでした')));
+          return;
+        }
+
+
         places.sort((a, b) => ((b['rating'] ?? 0).compareTo(a['rating'] ?? 0)));
 
         // setState()は状態を更新するためのメソッド
@@ -193,10 +223,8 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       } else {
         // エラーハンドリング
-        logger.e('Geocode API Error: ${geocodeData['status']}');
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('位置情報の取得に失敗しました')));
+        logger.e('Geocode API Error: ${jsonDecodeData['status']}');
+        ScaffoldMessenger.of( context, ).showSnackBar(const SnackBar(content: Text('位置情報の取得に失敗しました')));
       }
     } catch (e, stackTrace) {
       // エラーハンドリング
@@ -209,258 +237,256 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     logger.d('build()が呼ばれました: $_selectedType');
     try {
+      // Scaffoldは画面の基本的なレイアウトを提供するウィジェット
+      return Scaffold(
+        // AppBarは画面の上部に表示されるバー
+        // Text(AppStrings.appTitle) →AppStringsのクラスにて定義したstatic constに設定した「appTitle」を呼び出す
+        appBar: AppBar(title: const Text(AppStrings.appTitle)),
+        body: Padding(
+          // Paddingはウィジェットの周りに余白を作るためのウィジェット
+          // EdgeInsets.all(16.0)は全ての方向に16.0の余白を作る
+          // EdgeInsetsはウィジェットの周りに余白を作るためのクラス
+          padding: const EdgeInsets.all(16.0),
 
-    // Scaffoldは画面の基本的なレイアウトを提供するウィジェット
-    return Scaffold(
-      // AppBarは画面の上部に表示されるバー
-      // Text(AppStrings.appTitle) →AppStringsのクラスにて定義したstatic constに設定した「appTitle」を呼び出す
-      appBar: AppBar(title: const Text(AppStrings.appTitle)),
-      body: Padding(
-        // Paddingはウィジェットの周りに余白を作るためのウィジェット
-        // EdgeInsets.all(16.0)は全ての方向に16.0の余白を作る
-        // EdgeInsetsはウィジェットの周りに余白を作るためのクラス
-        padding: const EdgeInsets.all(16.0),
-
-        // Columnは縦にウィジェットを並べるためのウィジェット
-        // childrenはColumnの子ウィジェットを指定するためのプロパティ
-        child: Column(
-          children: [
-            // TextFieldはテキスト入力フィールドを作成するためのウィジェット
-            SizedBox(
-              width: 300, // 幅を調整
-              child: TextField(
-                controller: _stationController,
-                decoration: const InputDecoration(
-                  labelText: AppStrings.searchHint,
-                ),
-              ),
-            ),
-
-            // 余白を作るためのウィジェット
-            const SizedBox(height: 32.0),
-
-            Center(
-              child: SizedBox(
+          // Columnは縦にウィジェットを並べるためのウィジェット
+          // childrenはColumnの子ウィジェットを指定するためのプロパティ
+          child: Column(
+            children: [
+              // TextFieldはテキスト入力フィールドを作成するためのウィジェット
+              SizedBox(
                 width: 300, // 幅を調整
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '希望の診療科を選択してください',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    // DropdownButtonはドロップダウンリストを作成するウィジェット
-                    DropdownButton<String>(
-                      value: _selectedType,
-                      isExpanded: true,
-
-                      // hintはドロップダウンリストの初期表示を指定するためのプロパティ
-                      hint: const Text(
-                        AppStrings.dropDownSelectHint,
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                      items:
-                          <String>[
-                            '小児科',
-                            '内科',
-                            '耳鼻科',
-                            '眼科',
-                            '皮膚科',
-                            '整形外科',
-                            '歯科',
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Center(child: Text(value)),
-                            );
-                          }).toList(),
-
-                      // hintはドロップダウンリストの初期表示を指定するためのプロパティ
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedType = newValue!;
-                        }); // _selectedTypeに選択された値を代入する
-                      }, // onChanged
-                    ), // DropdownButton
-                  ], // Column.children
+                child: TextField(
+                  controller: _stationController,
+                  decoration: const InputDecoration(
+                    labelText: AppStrings.searchHint,
+                  ),
                 ),
               ),
-            ), // Center
-            // 余白を作るためのウィジェット
-            const SizedBox(height: 32.0),
 
-            // ElevatedButtonは押せるボタンを作成するウィジェット
-            // onPressedはボタンが押されたときの処理を指定するためのプロパティ
-            // ここがトリガーになることで処理を実施される
-            ElevatedButton(
-              onPressed: searchPlaces,
-              child: const Text(AppStrings.searchButton),
-            ),
+              // 余白を作るためのウィジェット
+              const SizedBox(height: 32.0),
 
-            // 余白を作るためのウィジェット
-            const SizedBox(height: 16.0),
+              Center(
+                child: SizedBox(
+                  width: 300, // 幅を調整
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '希望の診療科を選択してください',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
 
-            // スペースをできるだけ広く使ってくれるウィジェット→残ったスペースを使って行う
-            // リストを表示させてスクロールできるようにするためのウィジェット
-            Expanded(
-              child: ListView.builder(
-                itemCount: _places.length,
-                itemBuilder: (context, index) {
-                  final place = _places[index];
-                  logger.d(place);
+                      // DropdownButtonはドロップダウンリストを作成するウィジェット
+                      DropdownButton<String>(
+                        value: _selectedType,
+                        isExpanded: true,
 
-                  // ListTileはリストの1行を作成するためのウィジェット
-                  return Card(
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        // hintはドロップダウンリストの初期表示を指定するためのプロパティ
+                        hint: const Text(
+                          AppStrings.dropDownSelectHint,
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                        items:
+                            <String>[
+                              '小児科',
+                              '内科',
+                              '耳鼻科',
+                              '眼科',
+                              '皮膚科',
+                              '整形外科',
+                              '歯科',
+                            ].map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Center(child: Text(value)),
+                              );
+                            }).toList(),
 
-                        // Rowは横にウィジェットを並べるためのウィジェット
-                        // childrenはRowの子ウィジェットを指定するためのプロパティ
-                        children: [
-                          // 画像を表示するウィジェット
-                          if (place['photoUrl'] != null)
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                place['photoUrl'],
+                        // hintはドロップダウンリストの初期表示を指定するためのプロパティ
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            _selectedType = newValue!;
+                          }); // _selectedTypeに選択された値を代入する
+                        }, // onChanged
+                      ), // DropdownButton
+                    ], // Column.children
+                  ),
+                ),
+              ), // Center
+              // 余白を作るためのウィジェット
+              const SizedBox(height: 32.0),
+
+              // ElevatedButtonは押せるボタンを作成するウィジェット
+              // onPressedはボタンが押されたときの処理を指定するためのプロパティ
+              // ここがトリガーになることで処理を実施される
+              ElevatedButton(
+                onPressed: searchPlaces,
+                child: const Text(AppStrings.searchButton),
+              ),
+
+              // 余白を作るためのウィジェット
+              const SizedBox(height: 16.0),
+
+              // スペースをできるだけ広く使ってくれるウィジェット→残ったスペースを使って行う
+              // リストを表示させてスクロールできるようにするためのウィジェット
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _places.length,
+                  itemBuilder: (context, index) {
+                    final place = _places[index];
+                    logger.d(place);
+
+                    // ListTileはリストの1行を作成するためのウィジェット
+                    return Card(
+                      elevation: 2,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+
+                          // Rowは横にウィジェットを並べるためのウィジェット
+                          // childrenはRowの子ウィジェットを指定するためのプロパティ
+                          children: [
+                            // 画像を表示するウィジェット
+                            if (place['photoUrl'] != null)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  place['photoUrl'],
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            else
+                              // 画像がない場合はデフォルトの画像を表示する
+                              Image.asset(
+                                'assets/no_image_photo.png',
                                 width: 100,
                                 height: 100,
-                                fit: BoxFit.cover,
+                                color: Colors.grey[300],
                               ),
-                            )
-                          else
-                            // 画像がない場合はデフォルトの画像を表示する
-                            Image.asset(
-                              'assets/no_image_photo.png',
-                              width: 100,
-                              height: 100,
-                              color: Colors.grey[300],
-                            ),
 
-                          // 余白を作るためのウィジェット
-                          const SizedBox(width: 8),
+                            // 余白を作るためのウィジェット
+                            const SizedBox(width: 8),
 
-                          // 画像の右側に病院名、住所、評価を表示するウィジェット
-                          Expanded(
-                            child: Column(
-                              // crossAxisAlignmentは横方向の配置を指定するためのプロパティ
-                              // CrossAxisAlignment.startは左寄せにするためのプロパティ
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // 病院名をリンク付きor通常表示
-                                // リンク付きのテキストを表示するウィジェット
-                                // Tooltipは長押しで説明を表示するためのウィジェット
-                                // messageは説明文を指定するためのプロパティ
-                                // place['website']がnullでない場合はリンク付きのテキストを表示する
-                                // place['website']がnullの場合は通常のテキストを表示する
-                                (place['place_id'] != null)
-                                    ? Tooltip(
-                                      message: '公式サイトまたはGoogleマップを開く',
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          final placeId = place['place_id'];
-                                          final url =
-                                              await fetchWebsiteOrFallback(
-                                                placeId,
+                            // 画像の右側に病院名、住所、評価を表示するウィジェット
+                            Expanded(
+                              child: Column(
+                                // crossAxisAlignmentは横方向の配置を指定するためのプロパティ
+                                // CrossAxisAlignment.startは左寄せにするためのプロパティ
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // 病院名をリンク付きor通常表示
+                                  // リンク付きのテキストを表示するウィジェット
+                                  // Tooltipは長押しで説明を表示するためのウィジェット
+                                  // messageは説明文を指定するためのプロパティ
+                                  // place['website']がnullでない場合はリンク付きのテキストを表示する
+                                  // place['website']がnullの場合は通常のテキストを表示する
+                                  (place['place_id'] != null)
+                                      ? Tooltip(
+                                        message: '公式サイトまたはGoogleマップを開く',
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            final placeId = place['place_id'];
+                                            final url =
+                                                await fetchWebsiteOrFallback(
+                                                  placeId,
+                                                );
+                                            if (!context.mounted) return;
+                                            if (await canLaunchUrl(url)) {
+                                              await launchUrl(
+                                                url,
+                                                mode:
+                                                    LaunchMode
+                                                        .externalApplication,
                                               );
-                                          if (!context.mounted) return;
-                                          if (await canLaunchUrl(url)) {
-                                            await launchUrl(
-                                              url,
-                                              mode:
-                                                  LaunchMode
-                                                      .externalApplication,
-                                            );
-                                          } else {
-                                            ScaffoldMessenger.of(
-                                              context,
-                                            ).showSnackBar(
-                                              const SnackBar(
-                                                content: Text('リンクを開けませんでした'),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: Text(
-                                          place['name'] ?? '名称なし',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                            color: Colors.blue,
-                                            decoration:
-                                                TextDecoration.underline,
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('リンクを開けませんでした'),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                          child: Text(
+                                            place['name'] ?? '名称なし',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18,
+                                              color: Colors.blue,
+                                              decoration:
+                                                  TextDecoration.underline,
+                                            ),
                                           ),
                                         ),
+                                      )
+                                      : SelectableText(
+                                        place['name'] ?? '名称なし',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
                                       ),
-                                    )
-                                    : SelectableText(
-                                      place['name'] ?? '名称なし',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 18,
-                                      ),
-                                    ),
 
-                                // 余白を作るためのウィジェット
-                                const SizedBox(height: 4),
+                                  // 余白を作るためのウィジェット
+                                  const SizedBox(height: 4),
 
-                                // 評価を表示するウィジェット
-                                SelectableText(
-                                  '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-
-                                // 余白を作るためのウィジェット
-                                const SizedBox(height: 4),
-
-                                // 住所を表示するウィジェット
-                                SelectableText(
-                                  place['vicinity'] ?? '住所登録なし',
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-
-                                // 余白を作るためのウィジェット
-                                const SizedBox(height: 4),
-
-                                // 地図アプリへジャンプするためのウィジェット
-                                if (place['lat'] != null &&
-                                    place['lng'] != null)
-                                  // 地図アプリへジャンプするためのウィジェット
-                                  // MapAppSwitchButtonはGoogleマップを開くためのボタン
-                                  // AppStrings.textMapButtonはボタンのラベルを指定するためのプロパティ
-                                  MapAppSwitchButton(
-                                    lat: (place['lat'] as num).toDouble(),
-                                    lng: (place['lng'] as num).toDouble(),
-                                    label: AppStrings.textMapButton,
+                                  // 評価を表示するウィジェット
+                                  SelectableText(
+                                    '評価: ${place['rating']?.toString() ?? '評価なし'}(${place['user_ratings_total'] ?? 0}件)',
+                                    style: const TextStyle(fontSize: 14),
                                   ),
-                              ], // Column.children
+
+                                  // 余白を作るためのウィジェット
+                                  const SizedBox(height: 4),
+
+                                  // 住所を表示するウィジェット
+                                  SelectableText(
+                                    place['vicinity'] ?? '住所登録なし',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+
+                                  // 余白を作るためのウィジェット
+                                  const SizedBox(height: 4),
+
+                                  // 地図アプリへジャンプするためのウィジェット
+                                  if (place['lat'] != null &&
+                                      place['lng'] != null)
+                                    // 地図アプリへジャンプするためのウィジェット
+                                    // MapAppSwitchButtonはGoogleマップを開くためのボタン
+                                    // AppStrings.textMapButtonはボタンのラベルを指定するためのプロパティ
+                                    MapAppSwitchButton(
+                                      lat: (place['lat'] as num).toDouble(),
+                                      lng: (place['lng'] as num).toDouble(),
+                                      label: AppStrings.textMapButton,
+                                    ),
+                                ], // Column.children
+                              ),
                             ),
-                          ),
-                        ], //Row.children
+                          ], //Row.children
+                        ),
                       ),
-                    ),
-                  );
-                }, // Child
+                    );
+                  }, // Child
+                ),
               ),
-            ),
-          ], // Column.children
+            ], // Column.children
+          ),
         ),
-      ),
-    );
-  } catch (e, stack) {
+      );
+    } catch (e, stack) {
       // エラーハンドリング
       logger.e('処理中にエラーが発生いたしました: $e');
       logger.e('StackTrace: $stack');
       return const Center(child: Text('UIの描画中にエラーが発生しました'));
-
     }
   }
 }

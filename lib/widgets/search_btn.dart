@@ -1,7 +1,7 @@
 //? 検索ボタン関係を格納するファイル
 //? Dart imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/strings.dart';
+import 'package:gm_reviews_search_doctor_app/const/strings.dart';
 
 //* ------------------------------------------------------------
 
