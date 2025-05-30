@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
-import 'package:gm_reviews_search_doctor_app/features/map/services/gm_place_request.dart';
+import 'package:gm_reviews_search_doctor_app/features/map/services/gm_detail_place_request.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 // **********************************************************************************
@@ -27,7 +27,7 @@ class MapAppSwitchButton extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      final Uri url = await GMPlaceRequest.findPlaceWebsiteOrMapUrl(placeId);
+      final Uri url = await GMDetailPlaceRequest.findPlaceWebsiteOrMapUrl(placeId);
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       } else {

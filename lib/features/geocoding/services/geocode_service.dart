@@ -12,27 +12,36 @@ class GeocodeService {
     final url =
         'https://maps.googleapis.com/maps/api/geocode/json?address=$stationName&language=ja&key=$apiKey';
 
-    final res = await http.get(Uri.parse(url));
-    if (res.statusCode != 200) throw Exception('Geocode API failed');
-    logger.d('APIのレスポンス: ${res.body}'); // レスポンスのログ出力
+    try {
+      final res = await http.get(Uri.parse(url));
+      if (res.statusCode != 200) throw Exception('Geocode API failed');
+      logger.d('APIのレスポンス: ${res.body}'); // レスポンスのログ出力
 
-    final data = json.decode(res.body);
-    logger.d('デコードされたデータ: $data'); // デコード後のデータのログ出力
+      final data = json.decode(res.body);
+      logger.d('デコードされたデータ: $data'); // デコード後のデータのログ出力
 
-    final status = data['status'];
-    if (status != "OK") throw Exception('Geocode API status=$status');
+      final status = data['status'];
+      if (status != "OK") throw Exception('Geocode API status=$status');
 
-    final location = data['results'][0]['geometry']['location'];
+      final location = data['results'][0]['geometry']['location'];
 
-    // Map<String, double>→Stringはkeyの型 → doubleはvalueの型
-    // doubleは小数点もありの型
-    final Map<String, double> stationLocation = {
-      'lat': location['lat'],
-      'lng': location['lng'],
-    };
+      // Map<String, double>→Stringはkeyの型 → doubleはvalueの型
+      // doubleは小数点もありの型
+      final Map<String, double> stationLocation = {
+        'lat': location['lat'],
+        'lng': location['lng'],
+      };
 
-    logger.d('取得した緯度経度: ${stationLocation['lat']} ${stationLocation['lng']}'); // 取得した緯度経度のログ出力
-    return stationLocation;
+      logger.d('取得した緯度経度: ${stationLocation['lat']} ${stationLocation['lng']}'); // 取得した緯度経度のログ出力
+
+      //! 駅の緯度経度から周辺情報を取得するためにこの緯度と経度を使ってPlace APIを呼び出す必要がある
+      return stationLocation;
+
+    } catch (e, stackTrace) {
+      logger.e('Geocode APIエラー: $e');
+      logger.e('StackTrace: $stackTrace');
+      throw Exception('Geocode APIエラー: $e');
+    }
   }
 }
 
