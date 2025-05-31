@@ -1,11 +1,10 @@
 //? 検索ボタン関係を格納するファイル
-//? Dart imports ===============================================
+//? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/const/strings.dart';
-
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 //* ------------------------------------------------------------
 
-class BlueSearchBtn extends StatelessWidget {
+class SearchBtn extends StatelessWidget {
   // 変数を定義する
   final String btnLabel; // ボタンのラベル
   final Color backgroundColor;  // ボタンの背景色（定数として定義されている色を使用）
@@ -14,7 +13,7 @@ class BlueSearchBtn extends StatelessWidget {
 
   // dartではクラスを定義した際には必ずコンストラクタが必要
   // クラスで定義されている変数（インスタンス変数）はコンストラクタでthis.を使って受け渡しする必要がある
-  const BlueSearchBtn({
+  const SearchBtn({
     super.key, // このクラスでのkeyを受け渡しするように定義（あることでwidgetの場所などをわかりやすくできる）
     required this.btnLabel,
     required this.backgroundColor,
@@ -24,6 +23,7 @@ class BlueSearchBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logger.d('BlueSearchBtn: btnLabel: $btnLabel, backgroundColor: $backgroundColor, characterColor: $characterColor');
     return SizedBox(
       width: 200,
       child: TextButton(

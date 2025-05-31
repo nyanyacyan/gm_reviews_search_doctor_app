@@ -1,5 +1,8 @@
+//? 検索ボタン関係を格納するファイル
+//? imports ===============================================
 import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+//* ------------------------------------------------------------
 
 class InputTextField extends StatefulWidget {
   final String? labelText;
@@ -19,6 +22,9 @@ class InputTextField extends StatefulWidget {
   State<InputTextField> createState() => _InputTextFieldState();
 }
 
+//* ------------------------------------------------------------
+// InputTextFieldの状態を管理するStateクラス
+
 class _InputTextFieldState extends State<InputTextField> {
   late TextEditingController _controller;
 
@@ -36,6 +42,8 @@ class _InputTextFieldState extends State<InputTextField> {
     _controller.dispose();
     super.dispose();
   }
+
+//* ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
