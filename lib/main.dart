@@ -27,7 +27,7 @@ import 'package:gm_reviews_search_doctor_app/data/dummy_data/err.dart'; // エ�
 import 'package:gm_reviews_search_doctor_app/data/dummy_data/empty.dart'; // 空データのダミーデータのインポート
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart'; // loggerのimport
-import 'package:gm_reviews_search_doctor_app/features/map/map_switch_btn.dart'; // Googleマップへのリンクボタンのimport
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_switch_btn.dart'; // Googleマップへのリンクボタンのimport
 // import 'package:url_launcher/url_launcher.dart';
 
 // アプリの起動時に最初に呼ばれる関数
@@ -323,6 +323,7 @@ class _SearchScreenState extends State<SearchScreen> {
               // ElevatedButtonは押せるボタンを作成するウィジェット
               // onPressedはボタンが押されたときの処理を指定するためのプロパティ
               // ここがトリガーになることで処理を実施される
+
               ElevatedButton(
                 onPressed: searchPlaces,
                 child: const Text(AppStrings.searchButton),

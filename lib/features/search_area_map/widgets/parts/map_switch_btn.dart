@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
-import 'package:gm_reviews_search_doctor_app/features/map/services/gm_detail_place_request.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 // **********************************************************************************

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/filter_dropdown.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/result_display.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/result_display.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 

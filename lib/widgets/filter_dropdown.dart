@@ -1,7 +1,10 @@
+//? キーワードとdropdownの値を返すwidget
+//? imports ===============================================
 import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/input_text_field.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/dropdown_select.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/search_btn.dart';
+//* ------------------------------------------------------------
 
 class FilterDropdownWidget extends StatelessWidget {
   // インスタンス変数
@@ -33,6 +36,8 @@ class FilterDropdownWidget extends StatelessWidget {
     required this.onSearchPressed,  // 検索ボタンが押されたときの処理
     required this.onChangedInputText,  // 入力欄のテキストが変更されたときの処理
   });
+
+//* ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
