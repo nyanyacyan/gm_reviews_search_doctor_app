@@ -6,9 +6,15 @@ import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/pa
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_app_button.dart';
 
 class SearchResultItem extends StatelessWidget {
+  // インスタンス変数
   final Map<String, dynamic> place;
 
-  const SearchResultItem({super.key, required this.place});
+  const SearchResultItem({
+    super.key,
+
+    // 引数
+    required this.place
+  });
 
   @override
   Widget build(BuildContext context) {
