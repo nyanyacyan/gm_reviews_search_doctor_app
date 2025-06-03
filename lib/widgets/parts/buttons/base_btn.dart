@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 //* ------------------------------------------------------------
 
-class SearchBtn extends StatelessWidget {
+class BaseBtn extends StatelessWidget {
   // 変数を定義する
   final String btnLabel; // ボタンのラベル
   final Color backgroundColor;  // ボタンの背景色（定数として定義されている色を使用）
@@ -13,7 +13,7 @@ class SearchBtn extends StatelessWidget {
 
   // dartではクラスを定義した際には必ずコンストラクタが必要
   // クラスで定義されている変数（インスタンス変数）はコンストラクタでthis.を使って受け渡しする必要がある
-  const SearchBtn({
+  const BaseBtn({
     super.key, // このクラスでのkeyを受け渡しするように定義（あることでwidgetの場所などをわかりやすくできる）
     required this.btnLabel,
     required this.backgroundColor,
