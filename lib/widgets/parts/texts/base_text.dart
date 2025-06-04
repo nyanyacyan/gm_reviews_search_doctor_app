@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 //* ------------------------------------------------------------
 
-class CommonText extends StatelessWidget {
+class BasicText extends StatelessWidget {
   final String text;
   final double fontSize;
   final FontWeight fontWeight;
   final Color? color;
 
-  const CommonText({
+  const BasicText({
     super.key,
     required this.text,
     this.fontSize = 14,

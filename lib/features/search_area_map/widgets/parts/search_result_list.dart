@@ -28,7 +28,7 @@ class SearchResultList extends StatelessWidget {
     return ListView.builder(
       itemCount: places.length,  // リストの長さを指定
       itemBuilder: (context, index) {  // 各アイテム(widget)を生成する
-        return SearchResultItem(place: places[index]);
+        return HospitalInfoCard(place: places[index]);
       },
     );
   }

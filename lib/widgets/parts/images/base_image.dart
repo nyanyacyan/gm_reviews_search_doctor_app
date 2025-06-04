@@ -3,13 +3,13 @@
 import 'package:flutter/material.dart';
 //* ------------------------------------------------------------
 
-class CommonImage extends StatelessWidget {
+class BasicImage extends StatelessWidget {
   final String? imageUrl;
   final double width;
   final double height;
   final BorderRadius borderRadius;
 
-  const CommonImage({
+  const BasicImage({
     super.key,
     required this.imageUrl,
     this.width = 100,

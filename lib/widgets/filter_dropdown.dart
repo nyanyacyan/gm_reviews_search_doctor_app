@@ -66,7 +66,7 @@ class FilterDropdownWidget extends StatelessWidget {
         const SizedBox(height: 16),
 
         // 検索ボタン
-        SearchBtn(
+        BaseBtn(
           btnLabel: btnLabelName,
           onPressedFunc: onSearchPressed,
           backgroundColor: Colors.blue,
