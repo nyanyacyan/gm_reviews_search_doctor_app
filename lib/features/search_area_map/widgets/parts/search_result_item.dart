@@ -16,7 +16,7 @@ class HospitalInfoCard extends StatelessWidget {
   const HospitalInfoCard({
     super.key,
 
-    // 引数
+    //
     required this.place
   });
 
