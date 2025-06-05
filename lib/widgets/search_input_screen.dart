@@ -6,7 +6,7 @@ import 'package:gm_reviews_search_doctor_app/widgets/parts/dropdown_select.dart'
 import 'package:gm_reviews_search_doctor_app/widgets/parts/buttons/base_btn.dart';
 //* ------------------------------------------------------------
 
-class FilterDropdownWidget extends StatelessWidget {
+class SearchInputScreen extends StatelessWidget {
   // インスタンス変数
   final String labelText;
   final String hintText;
@@ -20,7 +20,7 @@ class FilterDropdownWidget extends StatelessWidget {
   final VoidCallback onSearchPressed;
   final void Function(String inputText) onChangedInputText;
 
-  const FilterDropdownWidget({
+  const SearchInputScreen({
     super.key,
 
     // 引数

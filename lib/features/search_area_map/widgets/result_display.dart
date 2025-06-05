@@ -1,62 +1,41 @@
 //? search_result_item.dartにて作成されたカードwidgetリストを渡して表示させる
-//? imports ====================================================
+//? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/search_result_list.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'parts/search_result_item.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+//* ------------------------------------------------------------
 
-  @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
+class ResultDisplay extends StatelessWidget {
+  final List<Map<String, dynamic>> places;
+  final ScrollController scrollController;
 
-class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController _stationController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController();
+  const ResultDisplay({
+    super.key,
 
-  List<Map<String, dynamic>> _searchResults = [];
-
-  Future<void> _search() async {
-    // ここで検索処理を実施
-    final results = await searchPlaces(
-      station: _stationController.text,
-      category: _categoryController.text,
-    );
-
-    setState(() {
-      _searchResults = results;
-    });
-  }
+    // 引数
+    required this.places,
+    required this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('医療機関検索')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _stationController,
-              decoration: const InputDecoration(labelText: '駅名'),
-            ),
-            TextField(
-              controller: _categoryController,
-              decoration: const InputDecoration(labelText: '診療科（例：耳鼻科）'),
-            ),
-            const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: _search,
-              child: const Text('検索'),
-            ),
-            const SizedBox(height: 12),
-
-            // 検索結果があれば表示、なければ非表示
-            if (_searchResults.isNotEmpty)
-              Expanded(child: SearchResultList(places: _searchResults)),
-          ],
-        ),
-      ),
+    logger.d('[SearchResultList] ビルド開始: places.length=${places.length}');
+    // 空だった場合
+    if (places.isEmpty) {
+      return const Center(child: Text('検索結果はありません'));
+    }
+    // SearchResultItemによって生成されたものをリスト化して表示する
+    logger.d('[SearchResultList] ビルド完了: places.length=${places.length}');
+    // ListView.builder() がそのリストの長さを見て、必要な分だけWidgetを生成
+    return ListView.builder(
+      controller: scrollController, // スクロールコントローラーを指定
+      itemCount: places.length,  // リストの長さを指定
+      itemBuilder: (context, index) {  // 各アイテム(widget)を生成する
+        return HospitalInfoCard(place: places[index]);
+      },
     );
   }
 }
+
+//* ------------------------------------------------------------

@@ -31,9 +31,11 @@ class HospitalInfoCard extends StatelessWidget {
     final placeId = place['place_id'];
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
+
+    // TODO リンクURLを生成→作成したServiceを利用する
     final Uri linkUrl = Uri.parse('https://www.google.com/maps/place/?q=place_id=${place['place_id']}');
 
-    logger.d('[HospitalInfoCard] ビルド開始: placeId=$placeId, linkText=$linkText, addressText=$addressText, rating=$rating');
+    logger.d('[HospitalInfoCard] ビルド開始: \nplaceId=$placeId, \nlinkText=$linkText, \naddressText=$addressText, \nrating=$rating, \nlat=$lat, \nlng=$lng, \nimageUrl=$imageUrl, \nimageUrl=$imageUrl');
 
     return StyledCard(
       // Row 横並び

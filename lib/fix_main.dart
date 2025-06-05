@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
-import 'screens/home_page.dart';
+import 'screens/main_screen.dart';
 
 void main() {
   runApp(const MyApp());
