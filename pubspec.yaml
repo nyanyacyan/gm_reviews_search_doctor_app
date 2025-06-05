@@ -41,7 +41,9 @@ flutter:
 
   # アセットの設定→ビルドに含めてもらうように設定
   assets:
-    - .env
+    - .env.macos
+    - .env.ios
+    - .env.android
     - assets/icon/app_icon.png
     - assets/no_image_photo.png
 

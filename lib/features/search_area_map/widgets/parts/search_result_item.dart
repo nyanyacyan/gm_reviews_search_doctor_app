@@ -28,7 +28,7 @@ class HospitalInfoCard extends StatelessWidget {
     final linkText = place['name'];
     final addressText = place['vicinity'];
     final rating = place['rating'];
-    final placeId = place['place_id'];
+    final placeId = place['place_id'] as String;
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
 

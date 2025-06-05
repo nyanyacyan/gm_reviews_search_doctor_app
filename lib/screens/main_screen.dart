@@ -40,6 +40,7 @@ class _MainScreen extends State<MainScreen> {
           _places = results;
         });
 
+        if (!mounted) return; // ウィジェットがまだマウントされているか確認
         // DraggableScrollableSheet を表示
         showModalBottomSheet(
           context: context,
@@ -68,6 +69,7 @@ class _MainScreen extends State<MainScreen> {
               ),
         );
       } else {
+        if (!mounted) return; // ウィジェットがまだマウントされているか確認
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text(MainWidgetStrings.errMsgDropdownEmpty)));
@@ -75,6 +77,7 @@ class _MainScreen extends State<MainScreen> {
     } catch (e, stackTrace) {
       logger.e('検索中にエラーが発生しました: $e');
       logger.e('StackTrace: $stackTrace');
+      if (!mounted) return; // ウィジェットがまだマウントされているか確認
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text(MainWidgetStrings.errMsgSearchFailed)),
       );
