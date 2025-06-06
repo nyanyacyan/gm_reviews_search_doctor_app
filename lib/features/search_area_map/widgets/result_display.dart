@@ -21,6 +21,15 @@ class ResultDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     logger.d('[SearchResultList] ビルド開始: places.length=${places.length}');
+    logger.i('places; $places');
+
+    // 並び替え：評価）
+    places.sort((a, b) {
+      final aRating = (a['rating'] ?? 0).toDouble();
+      final bRating = (b['rating'] ?? 0).toDouble();
+      return bRating.compareTo(aRating);
+    });
+
     // 空だった場合
     if (places.isEmpty) {
       return const Center(child: Text('検索結果はありません'));
@@ -30,8 +39,9 @@ class ResultDisplay extends StatelessWidget {
     // ListView.builder() がそのリストの長さを見て、必要な分だけWidgetを生成
     return ListView.builder(
       controller: scrollController, // スクロールコントローラーを指定
-      itemCount: places.length,  // リストの長さを指定
-      itemBuilder: (context, index) {  // 各アイテム(widget)を生成する
+      itemCount: places.length, // リストの長さを指定
+      itemBuilder: (context, index) {
+        // 各アイテム(widget)を生成する
         return HospitalInfoCard(place: places[index]);
       },
     );

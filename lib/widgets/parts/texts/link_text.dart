@@ -2,6 +2,7 @@
 //? imports ===============================================
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 //* ------------------------------------------------------------
 
 class LinkText extends StatelessWidget {
@@ -28,6 +29,7 @@ class LinkText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logger.i('[LinkText] ビルド開始: text="$text", linkUrl="$linkUrl"');
     return GestureDetector(
       onTap: () async {
         if (await canLaunchUrl(linkUrl)) {

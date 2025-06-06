@@ -1,6 +1,7 @@
 //? search_result_item.dartにて作成されたカードwidgetリストを渡して表示させる
 //? imports ====================================================
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_switch_btn.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
@@ -25,7 +26,7 @@ class HospitalInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl = place['photoUrl'];
+    final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
     final linkText = place['name'];
     final addressText = place['vicinity'];
     final rating = place['rating'];
@@ -36,6 +37,13 @@ class HospitalInfoCard extends StatelessWidget {
     // TODO リンクURLを生成→作成したServiceを利用する
     final Uri linkUrl = Uri.parse('https://www.google.com/maps/place/?q=place_id=${place['place_id']}');
 
+    final photoData = place['photos']?[0]['photo_reference'];
+    final imageUrl = photoData != null
+        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoData&key=$apiKey'
+        : null; // 画像がない場合のプレースホルダー
+
+    logger.i('[HospitalInfoCard] place内容確認: $place');
+    logger.i('[HospitalInfoCard] photos: ${place['photos']}');
     logger.d('[HospitalInfoCard] ビルド開始: \nplaceId=$placeId, \nlinkText=$linkText, \naddressText=$addressText, \nrating=$rating, \nlat=$lat, \nlng=$lng, \nimageUrl=$imageUrl, \nimageUrl=$imageUrl');
 
     return StyledCard(
@@ -72,7 +80,7 @@ class HospitalInfoCard extends StatelessWidget {
                   fontSize: 12,
                   color: Colors.grey[700],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 MapAppSwitchButton(
                   lat: lat,
                   lng: lng,
