@@ -44,7 +44,7 @@ class SearchInputScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 入力欄
+        // 入力欄（左寄せ）
         InputTextField(
           labelText: labelText,
           hintText: hintText,
@@ -54,24 +54,28 @@ class SearchInputScreen extends StatelessWidget {
         const SizedBox(height: 16),
 
         // 絞り込み選択（ドロップダウン）
-        DropdownSelect(
-          selectedValue: selectedFilterValue,
-          items: items,
-          onChanged: (newValue) {
-            if (newValue != null) {
-              onDropdownChanged(context, newValue);
-            }
-          },
+        Center(
+          child: DropdownSelect(
+            selectedValue: selectedFilterValue,
+            items: items,
+            onChanged: (newValue) {
+              if (newValue != null) {
+                onDropdownChanged(context, newValue);
+              }
+            },
+          ),
         ),
         const SizedBox(height: 16),
 
         // 検索ボタン
-        BaseBtn(
-          btnLabel: btnLabelName,
-          onPressedFunc: onSearchPressed,
-          backgroundColor: Colors.blue,
-          characterColor: Colors.white,
-        ),
+        Center(
+          child: BaseBtn(
+            btnLabel: btnLabelName,
+            onPressedFunc: onSearchPressed,
+            backgroundColor: Colors.blue,
+            characterColor: Colors.white,
+          ),
+        )
       ],
     );
   }

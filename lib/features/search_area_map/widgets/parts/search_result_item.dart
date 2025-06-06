@@ -7,6 +7,7 @@ import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dar
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/link_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/base_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/cards/styled_card.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------
 
 class HospitalInfoCard extends StatelessWidget {
