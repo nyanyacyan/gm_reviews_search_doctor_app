@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_switch_btn.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
+// import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/link_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/base_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/cards/styled_card.dart';
-import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
+// import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------
 
 class HospitalInfoCard extends StatelessWidget {
@@ -46,50 +46,85 @@ class HospitalInfoCard extends StatelessWidget {
     logger.i('[HospitalInfoCard] photos: ${place['photos']}');
     logger.d('[HospitalInfoCard] ビルド開始: \nplaceId=$placeId, \nlinkText=$linkText, \naddressText=$addressText, \nrating=$rating, \nlat=$lat, \nlng=$lng, \nimageUrl=$imageUrl, \nimageUrl=$imageUrl');
 
-    return StyledCard(
-      // Row 横並び
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          BasicImage(
-            imageUrl: imageUrl,
-            width: 100,
-            height: 100,
+    return Card(
+      margin: const EdgeInsets.all(8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      elevation: 4,
+      child: SizedBox(
+        height: 120, // 高さを明示的に指定することでレイアウトエラーを回避
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 左側：画像など（仮でContainerを使用）
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: imageUrl != null
+                    ? Image.network(
+                        imageUrl,
+                        width: 100,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        width: 100,
+                        height: double.infinity,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.image),
+                      ),
+              ),
+              const SizedBox(width: 12),
+
+              // 右側：テキスト＆ボタン
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 上部：テキスト群
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LinkTextAutoSize(
+                          text: linkText,
+                          linkUrl: linkUrl,
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            if (rating != null)
+                              BasicText(
+                                text: '評価: ${rating.toStringAsFixed(1)}',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            const SizedBox(width: 8),
+                            if (place['user_ratings_total'] != null)
+                              BasicText(
+                                text: '口コミ: ${place['user_ratings_total']}件',
+                                fontSize: 12,
+                                color: Colors.grey[700],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        LinkText(
+                          text: addressText,
+                          linkUrl: Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng'),
+                          fontSize: 12,
+                          color: Colors.grey[700]!,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            // column 縦並び
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LinkText(
-                  text: linkText,
-                  linkUrl: linkUrl,
-                  fontSize: 16,
-                ),
-                const SizedBox(height: 4),
-                if (rating != null)
-                  BasicText(
-                    text: '評価: ${rating!.toStringAsFixed(1)}',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                const SizedBox(height: 4),
-                BasicText(
-                  text: addressText,
-                  fontSize: 12,
-                  color: Colors.grey[700],
-                ),
-                const SizedBox(height: 4),
-                MapAppSwitchButton(
-                  lat: lat,
-                  lng: lng,
-                  placeId: placeId
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

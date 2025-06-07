@@ -13,7 +13,7 @@ class BasicImage extends StatelessWidget {
     super.key,
     required this.imageUrl,
     this.width = 100,
-    this.height = 100,
+    this.height = 120,
     this.borderRadius = const BorderRadius.all(Radius.circular(8)),
   });
 

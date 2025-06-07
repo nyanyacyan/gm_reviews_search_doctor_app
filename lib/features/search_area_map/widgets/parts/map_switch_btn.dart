@@ -51,9 +51,13 @@ class MapAppSwitchButton extends StatelessWidget {
       child: TextButton(
         // ボタンのスタイルを設定
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          minimumSize: const Size.fromHeight(28),
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
 
         // 同じクラス内の場合にはそのまま記述できる
