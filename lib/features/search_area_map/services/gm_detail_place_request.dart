@@ -9,9 +9,7 @@ import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 
 class GMDetailPlaceRequest {
-  // staticを入れることによって直接呼び出せるようにする
-  // インスタンス化は基本しないほうが良い→どこででも呼び出せる＋メモリ消費が少ない
-  static Future<Uri> findPlaceWebsiteOrMapUrl(String placeId) async {
+  static Future<Uri?> findPlaceWebsiteOrNull(String placeId) async {
     final apiKey = dotenv.env['GOOGLE_MAPS_API_KEY'];
     final detailsUrl =
         'https://maps.googleapis.com/maps/api/place/details/json'
@@ -20,14 +18,14 @@ class GMDetailPlaceRequest {
     final res = await http.get(Uri.parse(detailsUrl));
     if (res.statusCode == 200) {
       final data = json.decode(res.body);
-      logger.d('APIのレスポンス: ${data}'); // レスポンスのログ出力
-
       final website = data['result']?['website'];
-      if (website != null) return Uri.parse(website);
+      if (website != null) {
+        return Uri.parse(website);
+      }
     }
 
-    // fallback to Google Maps detail page
-    return Uri.parse('https://www.google.com/maps/place/?q=place_id=$placeId');
+    // サイトが登録されていない場合には null を返す
+    return null;
   }
 }
 

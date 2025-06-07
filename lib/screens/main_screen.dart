@@ -63,6 +63,7 @@ class _MainScreen extends State<MainScreen> {
                     child: ResultDisplay(
                       places: _places,
                       scrollController: scrollController,
+                      scaffoldContext: context,
                     ),
                   );
                 },

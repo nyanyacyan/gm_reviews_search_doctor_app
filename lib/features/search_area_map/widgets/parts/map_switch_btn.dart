@@ -27,7 +27,7 @@ class MapAppSwitchButton extends StatelessWidget {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      final Uri url = await GMDetailPlaceRequest.findPlaceWebsiteOrMapUrl(placeId);
+      final Uri url = await GMDetailPlaceRequest.findPlaceWebsiteOrNull(placeId);
       if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
       } else {

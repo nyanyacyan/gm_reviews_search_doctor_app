@@ -108,3 +108,47 @@ class LinkTextAutoSize extends StatelessWidget {
 }
 
 //* ------------------------------------------------------------
+
+class ActionLinkTextAutoSize extends StatelessWidget {
+  final String text;
+
+  // onTap 実行時に呼ばれる関数（外部から渡す）
+  final VoidCallback? onTap;
+
+  // 任意スタイル引数（必要なら残す）
+  final double fontSize;
+  final Color color;
+  final FontWeight fontWeight;
+  final TextDecoration decoration;
+
+  const ActionLinkTextAutoSize({
+    super.key,
+    required this.text,
+    this.onTap,
+    this.fontSize = 16,
+    this.color = Colors.blue,
+    this.fontWeight = FontWeight.bold,
+    this.decoration = TextDecoration.underline,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap, // ← 呼び出し元で指定された関数を実行
+      child: AutoSizeText(
+        text,
+        style: TextStyle(
+          fontSize: fontSize,
+          color: color,
+          fontWeight: fontWeight,
+          decoration: decoration,
+        ),
+        maxLines: 1,
+        minFontSize: 10,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+//* ------------------------------------------------------------

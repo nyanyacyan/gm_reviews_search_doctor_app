@@ -2,13 +2,14 @@
 //? imports ====================================================
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_switch_btn.dart';
+// import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/parts/map_switch_btn.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 // import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/link_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/base_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/cards/styled_card.dart';
-// import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------
 
 class HospitalInfoCard extends StatelessWidget {
@@ -88,9 +89,41 @@ class HospitalInfoCard extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        LinkTextAutoSize(
+                        ActionLinkTextAutoSize(
                           text: linkText,
-                          linkUrl: linkUrl,
+                          onTap: () async {
+                            final scaffoldTestMessenger = ScaffoldMessenger.of(context);
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              scaffoldTestMessenger.showSnackBar(
+                                const SnackBar(content: Text('✅ SnackBar テスト表示（ActionLink内）')),
+                              );
+                            });
+
+                            final messenger = ScaffoldMessenger.of(context);
+                            try {
+                              final uri = await GMDetailPlaceRequest.findPlaceWebsiteOrNull(placeId);
+
+                              if (uri != null) {
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                } else {
+                                  logger.e('[HospitalInfoCard] リンク起動失敗: $uri');
+                                  messenger.showSnackBar(
+                                    const SnackBar(content: Text('リンクを開けませんでした')),
+                                  );
+                                }
+                              } else {
+                                logger.w('[HospitalInfoCard] サイトが登録されていません: $linkText');
+                                messenger.showSnackBar(
+                                  const SnackBar(content: Text('この施設には公式サイトが登録されていません')),
+                                );
+                              }
+                            } catch (e) {
+                              messenger.showSnackBar(
+                                SnackBar(content: Text('エラーが発生しました: $e')),
+                              );
+                            }
+                          }
                         ),
                         const SizedBox(height: 4),
                         Row(

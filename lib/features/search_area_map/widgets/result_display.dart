@@ -9,6 +9,7 @@ import 'parts/search_result_item.dart';
 class ResultDisplay extends StatelessWidget {
   final List<Map<String, dynamic>> places;
   final ScrollController scrollController;
+  final BuildContext scaffoldContext;
 
   const ResultDisplay({
     super.key,
@@ -16,6 +17,7 @@ class ResultDisplay extends StatelessWidget {
     // 引数
     required this.places,
     required this.scrollController,
+    required this.scaffoldContext,
   });
 
   @override
