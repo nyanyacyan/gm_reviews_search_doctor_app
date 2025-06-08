@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gm_reviews_search_doctor_app/utils/global_keys.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
 import 'package:gm_reviews_search_doctor_app/const/select_value.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/search_input_screen.dart';
@@ -21,6 +22,20 @@ class _MainScreen extends State<MainScreen> {
 
   final List<String> _categoryItems = SelectValue.medicalTypeList;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // WidgetsBinding で post-frame に SnackBar 表示（テスト）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      logger.i('[MainScreen] postFrameCallbackが呼ぼう');
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+        const SnackBar(content: Text('✅ SnackBar 表示テスト in MainScreen')),
+      );
+      logger.i('[MainScreen] postFrameCallbackが呼ばれました');
+    });
+  }
+
   Future<void> _search() async {
     try {
       if (_selectedCategory == MainWidgetStrings.initialValue) {
@@ -40,46 +55,46 @@ class _MainScreen extends State<MainScreen> {
           _places = results;
         });
 
-        if (!mounted) return; // ウィジェットがまだマウントされているか確認
-        // DraggableScrollableSheet を表示
+        if (!mounted) return;
+
+        final scaffoldContext = context; // ← ここで一度保存！
+
         showModalBottomSheet(
-          context: context,
+          context: scaffoldContext,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder:
-              (context) => DraggableScrollableSheet(
-                initialChildSize: 0.4,
-                minChildSize: 0.2,
-                maxChildSize: 0.9,
-                expand: false,
-                builder: (context, scrollController) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    child: ResultDisplay(
-                      places: _places,
-                      scrollController: scrollController,
-                      scaffoldContext: context,
-                    ),
-                  );
-                },
-              ),
+          builder: (_) => DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 0.9,
+            expand: false,
+            builder: (_, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                ),
+                child: ResultDisplay(
+                  places: _places,
+                  scrollController: scrollController, // スクロールコントローラーを渡す
+                ),
+              );
+            },
+          ),
         );
       } else {
         if (!mounted) return; // ウィジェットがまだマウントされているか確認
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text(MainWidgetStrings.errMsgDropdownEmpty)));
+        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+          const SnackBar(content: Text(MainWidgetStrings.errMsgDropdownEmpty)),
+        );
       }
     } catch (e, stackTrace) {
       logger.e('検索中にエラーが発生しました: $e');
       logger.e('StackTrace: $stackTrace');
       if (!mounted) return; // ウィジェットがまだマウントされているか確認
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
         const SnackBar(content: Text(MainWidgetStrings.errMsgSearchFailed)),
       );
     }
@@ -87,7 +102,10 @@ class _MainScreen extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('[MainScreen] ビルド開始: _stationName=$_stationName, _selectedCategory=$_selectedCategory');
+    logger.d(
+      '[MainScreen] ビルド開始: _stationName=$_stationName, _selectedCategory=$_selectedCategory',
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text(MainWidgetStrings.appTitle)),
       body: Padding(
@@ -111,7 +129,7 @@ class _MainScreen extends State<MainScreen> {
               _selectedCategory = newValue;
             });
           },
-          onSearchPressed: _search,
+          onSearchPressed: () => _search(), // ← 引数で渡す！
         ),
       ),
     );

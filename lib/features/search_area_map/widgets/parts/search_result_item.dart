@@ -8,22 +8,18 @@ import 'package:url_launcher/url_launcher.dart';
 // import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/link_text.dart';
 import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/base_text.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/cards/styled_card.dart';
+import 'package:gm_reviews_search_doctor_app/utils/dialog.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------
+
 
 class HospitalInfoCard extends StatelessWidget {
   final Map<String, dynamic> place;
 
-
   const HospitalInfoCard({
     super.key,
-
-    //
-    required this.place
+    required this.place,
   });
-
-//* ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -35,32 +31,24 @@ class HospitalInfoCard extends StatelessWidget {
     final lat = place['geometry']['location']['lat'];
     final lng = place['geometry']['location']['lng'];
 
-    // TODO リンクURLを生成→作成したServiceを利用する
-    final Uri linkUrl = Uri.parse('https://www.google.com/maps/place/?q=place_id=${place['place_id']}');
-
     final photoData = place['photos']?[0]['photo_reference'];
     final imageUrl = photoData != null
         ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoData&key=$apiKey'
-        : null; // 画像がない場合のプレースホルダー
+        : null;
 
     logger.i('[HospitalInfoCard] place内容確認: $place');
-    logger.i('[HospitalInfoCard] photos: ${place['photos']}');
-    logger.d('[HospitalInfoCard] ビルド開始: \nplaceId=$placeId, \nlinkText=$linkText, \naddressText=$addressText, \nrating=$rating, \nlat=$lat, \nlng=$lng, \nimageUrl=$imageUrl, \nimageUrl=$imageUrl');
 
     return Card(
       margin: const EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 4,
       child: SizedBox(
-        height: 120, // 高さを明示的に指定することでレイアウトエラーを回避
+        height: 120,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 左側：画像など（仮でContainerを使用）
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: imageUrl != null
@@ -79,51 +67,56 @@ class HospitalInfoCard extends StatelessWidget {
               ),
               const SizedBox(width: 12),
 
-              // 右側：テキスト＆ボタン
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 上部：テキスト群
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ActionLinkTextAutoSize(
-                          text: linkText,
-                          onTap: () async {
-                            final scaffoldTestMessenger = ScaffoldMessenger.of(context);
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              scaffoldTestMessenger.showSnackBar(
-                                const SnackBar(content: Text('✅ SnackBar テスト表示（ActionLink内）')),
-                              );
-                            });
+                        Builder(
+                          builder: (context) {
+                            return ActionLinkTextAutoSize(
+                              text: linkText,
+                              onTap: () async {
+                                try {
+                                  final uri = await GMDetailPlaceRequest.findPlaceWebsiteOrNull(placeId);
 
-                            final messenger = ScaffoldMessenger.of(context);
-                            try {
-                              final uri = await GMDetailPlaceRequest.findPlaceWebsiteOrNull(placeId);
-
-                              if (uri != null) {
-                                if (await canLaunchUrl(uri)) {
-                                  await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                } else {
-                                  logger.e('[HospitalInfoCard] リンク起動失敗: $uri');
-                                  messenger.showSnackBar(
-                                    const SnackBar(content: Text('リンクを開けませんでした')),
-                                  );
+                                  if (uri != null) {
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                    } else {
+                                      logger.e('[HospitalInfoCard] リンク起動失敗: $uri');
+                                      if (!context.mounted) return;
+                                      showInfoDialog(
+                                        context: context,
+                                        title: 'リンクを開けませんでした',
+                                        message: 'リンクを開けませんでした。ブラウザで開いてみてください。',
+                                      );
+                                    }
+                                  } else {
+                                    logger.w('[HospitalInfoCard] サイトが登録されていません: $linkText');
+                                    if (!context.mounted) return;
+                                      showInfoDialog(
+                                        context: context,
+                                        title: '登録サイトなし',
+                                        message: 'この施設にはGoogleマップにサイトの登録されていないようです。',
+                                      );
+                                  }
+                                } catch (e) {
+                                  if (!context.mounted) return;
+                                    showInfoDialog(
+                                      context: context,
+                                      title: 'サイトが開けませんでした',
+                                      message: '処理中にエラーが発生しました。後ほど再度お試しください。',
+                                    );
+                                  logger.e('[HospitalInfoCard] リンク取得エラー: $e');
+                                  logger.e('StackTrace: ${StackTrace.current}');
                                 }
-                              } else {
-                                logger.w('[HospitalInfoCard] サイトが登録されていません: $linkText');
-                                messenger.showSnackBar(
-                                  const SnackBar(content: Text('この施設には公式サイトが登録されていません')),
-                                );
-                              }
-                            } catch (e) {
-                              messenger.showSnackBar(
-                                SnackBar(content: Text('エラーが発生しました: $e')),
-                              );
-                            }
-                          }
+                              },
+                            );
+                          },
                         ),
                         const SizedBox(height: 4),
                         Row(
@@ -151,7 +144,7 @@ class HospitalInfoCard extends StatelessWidget {
                           color: Colors.grey[700]!,
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
