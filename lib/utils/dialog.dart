@@ -28,7 +28,7 @@ Future<void> showInfoDialog({
 }
 
 // -------------------------------------------------------------
-
+// カスタムダイアログを表示する関数
 Future<void> showCustomDialog({
   required BuildContext context,
   required String title,
@@ -67,6 +67,69 @@ Future<void> showCustomDialog({
         ],
       );
     },
+  );
+}
+
+// *************************************************************
+// エラーを表示するダイアログ
+
+Future<void> showErrorDialog({
+  required BuildContext context,
+  required String message,
+}) {
+  return showDialog(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text('エラー', style: TextStyle(color: Colors.red)),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('閉じる'),
+        ),
+      ],
+    ),
+  );
+}
+
+// *************************************************************
+// 確認ダイアログを表示する関数
+
+Future<bool> showConfirmationDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+}) async {
+  final result = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: const Text('いいえ'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: const Text('はい'),
+        ),
+      ],
+    ),
+  );
+  return result ?? false;
+}
+
+// *************************************************************
+// ローディングダイアログを表示する関数
+
+Future<void> showLoadingDialog(BuildContext context) async {
+  return showDialog(
+    barrierDismissible: false,
+    context: context,
+    builder: (_) => const Center(
+      child: CircularProgressIndicator(),
+    ),
   );
 }
 

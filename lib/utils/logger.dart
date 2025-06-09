@@ -129,6 +129,7 @@ class DailyFileLogOutput extends LogOutput {
 const _reset = '\x1B[0m';
 const _gray = '\x1B[90m';
 const _blue = '\x1B[34m';
+const _green = '\x1B[32m';
 const _yellow = '\x1B[33m';
 const _red = '\x1B[31m';
 const _magenta = '\x1B[35m';
@@ -141,14 +142,20 @@ void logInfo(String msg) {
   developer.log('$_blue[INFO] $msg$_reset');
 }
 
+void logCheckpoint(String msg) {
+  developer.log('$_green[INFO] $msg$_reset');
+}
+
 void logWarning(String msg) {
   developer.log('$_yellow[WARNING] $msg$_reset');
 }
 
-void logError(String msg) {
-  developer.log('$_red[ERROR] $msg$_reset');
+void logError(String msg, Object error, StackTrace stackTrace) {
+  final message = '$_red[ERROR] $msg\n$error\n$stackTrace$_reset';
+  developer.log(message);
 }
 
-void logCritical(String msg) {
-  developer.log('$_magenta[CRITICAL] $msg$_reset');
+void logCritical(String msg, Object error, StackTrace stackTrace) {
+  final message = '$_magenta[CRITICAL] $msg\n$error\n$stackTrace$_reset';
+  developer.log(message);
 }
