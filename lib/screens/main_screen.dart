@@ -27,19 +27,19 @@ class _MainScreen extends State<MainScreen> {
 
   final List<String> _categoryItems = SelectValue.medicalTypeList;
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    // WidgetsBinding で post-frame に SnackBar 表示（テスト）
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      logInfo('[MainScreen] postFrameCallbackが呼ぼう');
-      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
-        const SnackBar(content: Text('✅ SnackBar 表示テスト in MainScreen')),
-      );
-      logInfo('[MainScreen] postFrameCallbackが呼ばれました');
-    });
-  }
+  //   // WidgetsBinding で post-frame に SnackBar 表示（テスト）
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     logInfo('[MainScreen] postFrameCallbackが呼ぼう');
+  //     ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
+  //       const SnackBar(content: Text('✅ SnackBar 表示テスト in MainScreen')),
+  //     );
+  //     logInfo('[MainScreen] postFrameCallbackが呼ばれました');
+  //   });
+  // }
 
   // -------------------------------------------------------------
 

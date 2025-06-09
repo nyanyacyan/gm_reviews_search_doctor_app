@@ -44,12 +44,12 @@ flutter:
     - .env.macos
     - .env.ios
     - .env.android
-    - assets/icon/app_icon.png
+    - assets/icon/fix_app_icon.png
     - assets/no_image_photo.png
 
 # iconの設定
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/icon/app_icon.png"
+  image_path: "assets/icon/fix_app_icon.png"
 
