@@ -1,13 +1,13 @@
 //? 検索ボタン関係を格納するファイル
 //? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
 //* ------------------------------------------------------------
 
 class BaseBtn extends StatelessWidget {
   // 変数を定義する
   final String btnLabel; // ボタンのラベル
-  final Color backgroundColor;  // ボタンの背景色（定数として定義されている色を使用）
+  final Color backgroundColor; // ボタンの背景色（定数として定義されている色を使用）
   final Color characterColor; // ボタンの文字色（定数として定義されている色を使用）
   final VoidCallback onPressedFunc; // ボタンが押されたときの処理
 
@@ -23,7 +23,9 @@ class BaseBtn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('BlueSearchBtn: btnLabel: $btnLabel, backgroundColor: $backgroundColor, characterColor: $characterColor');
+    logDebug(
+      'BlueSearchBtn: btnLabel: $btnLabel, backgroundColor: $backgroundColor, characterColor: $characterColor',
+    );
     return SizedBox(
       width: 200,
       child: TextButton(

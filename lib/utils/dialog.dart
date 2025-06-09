@@ -1,4 +1,4 @@
-//? search_result_item.dartにて作成されたカードwidgetリストを渡して表示させる
+//? dialogを表示するための関数を定義
 //? imports ====================================================
 // 大元にあるmaterial系が利用するクラスや関数がある→showDialog(), AlertDialogなど
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ Future<void> showInfoDialog({
   );
 }
 
-//* ------------------------------------------------------------
+// -------------------------------------------------------------
 
 Future<void> showCustomDialog({
   required BuildContext context,
@@ -69,3 +69,5 @@ Future<void> showCustomDialog({
     },
   );
 }
+
+// *************************************************************

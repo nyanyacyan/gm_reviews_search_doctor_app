@@ -1,7 +1,7 @@
 //? dropdownを選択するwidget
 //? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
 //* ------------------------------------------------------------
 
 class DropdownSelect extends StatelessWidget {
@@ -23,7 +23,7 @@ class DropdownSelect extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('DropdownSelect: selectedValue: $selectedValue, items: $items');
+    logDebug('DropdownSelect: selectedValue: $selectedValue, items: $items');
     return Center(
       child: SizedBox(
         width: 180,
@@ -32,17 +32,16 @@ class DropdownSelect extends StatelessWidget {
           alignment: Alignment.center, //
           isExpanded: false, // trueだと広がりすぎるので注意
           onChanged: onChanged,
-          items: items.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Center( // 👈 ここで中央寄せ
-                child: Text(
-                  value,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }).toList(),
+          items:
+              items.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Center(
+                    // 👈 ここで中央寄せ
+                    child: Text(value, textAlign: TextAlign.center),
+                  ),
+                );
+              }).toList(),
         ),
       ),
     );

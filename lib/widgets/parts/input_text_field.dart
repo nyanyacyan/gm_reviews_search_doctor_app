@@ -1,7 +1,7 @@
 //? 検索ボタン関係を格納するファイル
 //? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
 //* ------------------------------------------------------------
 
 class InputTextField extends StatefulWidget {
@@ -43,11 +43,13 @@ class _InputTextFieldState extends State<InputTextField> {
     super.dispose();
   }
 
-//* ------------------------------------------------------------
+  //* ------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    logger.d('InputTextField:\n hintText: ${widget.hintText}\n inputData: ${widget.inputData}');
+    logDebug(
+      'InputTextField:\n hintText: ${widget.hintText}\n inputData: ${widget.inputData}',
+    );
     return TextField(
       controller: _controller,
       decoration: InputDecoration(

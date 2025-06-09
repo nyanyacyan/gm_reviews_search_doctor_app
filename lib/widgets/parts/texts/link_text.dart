@@ -20,25 +20,27 @@ class LinkText extends StatelessWidget {
     super.key,
 
     // 引数
-    required this.text,      // 表示テキスト
-    required this.linkUrl,   // リンク先URL
-    this.fontSize = 16,      // デフォルト値付き
+    required this.text, // 表示テキスト
+    required this.linkUrl, // リンク先URL
+    this.fontSize = 16, // デフォルト値付き
     this.color = Colors.blue,
     this.fontWeight = FontWeight.bold,
     this.decoration = TextDecoration.underline,
   });
 
+  // -----------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
-    logger.i('[LinkText] ビルド開始: text="$text", linkUrl="$linkUrl"');
+    logInfo('[LinkText] ビルド開始: text="$text", linkUrl="$linkUrl"');
     return GestureDetector(
       onTap: () async {
         if (await canLaunchUrl(linkUrl)) {
           await launchUrl(linkUrl, mode: LaunchMode.externalApplication);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('リンクを開けませんでした')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('リンクを開けませんでした')));
         }
       },
       child: Text(
@@ -59,8 +61,6 @@ class LinkText extends StatelessWidget {
 class LinkTextAutoSize extends StatelessWidget {
   final String text;
   final Uri linkUrl;
-
-  // 以下はスタイルに関する引数（任意）
   final double fontSize;
   final Color color;
   final FontWeight fontWeight;
@@ -70,25 +70,26 @@ class LinkTextAutoSize extends StatelessWidget {
     super.key,
 
     // 引数
-    required this.text,      // 表示テキスト
-    required this.linkUrl,   // リンク先URL
-    this.fontSize = 16,      // デフォルト値付き
+    required this.text, // 表示テキスト
+    required this.linkUrl, // リンク先URL
+    this.fontSize = 16, // デフォルト値付き
     this.color = Colors.blue,
     this.fontWeight = FontWeight.bold,
     this.decoration = TextDecoration.underline,
   });
 
+  // -------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
-    logger.i('[LinkText] ビルド開始: text="$text", linkUrl="$linkUrl"');
+    logInfo('[LinkText] ビルド開始: text="$text", linkUrl="$linkUrl"');
     return GestureDetector(
       onTap: () async {
         if (await canLaunchUrl(linkUrl)) {
           await launchUrl(linkUrl, mode: LaunchMode.externalApplication);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('リンクを開けませんでした')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('リンクを開けませんでした')));
         }
       },
       child: AutoSizeText(
@@ -130,6 +131,8 @@ class ActionLinkTextAutoSize extends StatelessWidget {
     this.fontWeight = FontWeight.bold,
     this.decoration = TextDecoration.underline,
   });
+
+  // -------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {

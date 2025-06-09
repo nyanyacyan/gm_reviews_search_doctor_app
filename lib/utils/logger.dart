@@ -1,13 +1,13 @@
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+//? loggerを設定をカスタマイズ
+//? imports ====================================================
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:developer' as developer; // ← ここに移動！
 
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+late final Logger logger;
+// -------------------------------------------------------------
 
 // 実行処理関数
 // setupLogger関数は、アプリケーションのロガーを初期化するためのもの
@@ -20,25 +20,16 @@ Future<DailyFileLogOutput> setupLogger() async {
   // ConsoleOutputは、ターミナルなどでの背景色を変更するために使用
   logger = Logger(
     level: Level.debug,
-    printer: CustomLogPrinter(),  // CustomLogPrinterクラスを使用
+    printer: CustomLogPrinter(), // CustomLogPrinterクラスを使用
     output: MultiOutput([
       ConsoleOutput(),
-      fileOutput,  // DailyFileLogOutputクラスを使用
+      fileOutput, // DailyFileLogOutputクラスを使用
     ]),
   );
   return fileOutput;
 }
 
-//! ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// loggerのカスタマイズ
-// 出力ログの色分けなどを追加
-
-//? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-late final Logger logger;
+// *************************************************************
 
 class CustomLogPrinter extends LogPrinter {
   static const levelColors = {
@@ -49,23 +40,25 @@ class CustomLogPrinter extends LogPrinter {
     Level.fatal: '\x1B[35m',
   };
 
-  static const levelEmojis = {
-    Level.debug: '🔍',
-    Level.info: '💡',
-    Level.warning: '⚠️',
-    Level.error: '⛔',
-    Level.fatal: '🚨',
+  static const levelLabels = {
+    Level.debug: '🔍 DEBUG',
+    Level.info: '💡 INFO',
+    Level.warning: '⚠️ WARNING',
+    Level.error: '⛔ ERROR',
+    Level.fatal: '🚨 FATAL',
   };
 
   @override
   List<String> log(LogEvent event) {
-    final color = levelColors[event.level] ?? '';
-    final emoji = levelEmojis[event.level] ?? '';
-    final resetColor = '\x1B[0m';
-    return ['$color$emoji ${event.message}$resetColor'];
+    final color = CustomLogPrinter.levelColors[event.level] ?? '';
+    final label =
+        CustomLogPrinter.levelLabels[event.level] ??
+        event.level.name.toUpperCase();
+    const resetColor = '\x1B[0m';
+
+    return ['$color[$label] ${event.message}$resetColor'];
   }
 }
-
 
 //? ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,12 +80,15 @@ class DailyFileLogOutput extends LogOutput {
 
   // createメソッドは、ログファイルを作成し、古いログを削除するためのもの
   static Future<DailyFileLogOutput> create() async {
-    final now = DateTime.now();  // 現在の日付と時刻を取得
-    final dateStr = DateFormat('yyyy-MM-dd').format(now);  // 日付を文字列にフォーマット
-    final directory = await getApplicationDocumentsDirectory();  // アプリのドキュメントディレクトリを取得
-    final file = File('${directory.path}/log/app_log_$dateStr.txt');  // ログファイルのパス
-    await file.create(recursive: true);  // ディレクトリが存在しない場合は作成
-    final sink = file.openWrite(mode: FileMode.append);  // 追記モードで開く
+    final now = DateTime.now(); // 現在の日付と時刻を取得
+    final dateStr = DateFormat('yyyy-MM-dd').format(now); // 日付を文字列にフォーマット
+    final directory =
+        await getApplicationDocumentsDirectory(); // アプリのドキュメントディレクトリを取得
+    final file = File(
+      '${directory.path}/log/app_log_$dateStr.txt',
+    ); // ログファイルのパス
+    await file.create(recursive: true); // ディレクトリが存在しない場合は作成
+    final sink = file.openWrite(mode: FileMode.append); // 追記モードで開く
 
     // 古いログ削除（7日以上前）
     final logDir = Directory('${directory.path}/log');
@@ -126,4 +122,33 @@ class DailyFileLogOutput extends LogOutput {
   }
 }
 
+//? ===========================================================
+//? 開発用デバッグログ（developer.log 使用）
+//? ===========================================================
 
+const _reset = '\x1B[0m';
+const _gray = '\x1B[90m';
+const _blue = '\x1B[34m';
+const _yellow = '\x1B[33m';
+const _red = '\x1B[31m';
+const _magenta = '\x1B[35m';
+
+void logDebug(String msg) {
+  developer.log('$_gray[DEBUG] $msg$_reset');
+}
+
+void logInfo(String msg) {
+  developer.log('$_blue[INFO] $msg$_reset');
+}
+
+void logWarning(String msg) {
+  developer.log('$_yellow[WARNING] $msg$_reset');
+}
+
+void logError(String msg) {
+  developer.log('$_red[ERROR] $msg$_reset');
+}
+
+void logCritical(String msg) {
+  developer.log('$_magenta[CRITICAL] $msg$_reset');
+}

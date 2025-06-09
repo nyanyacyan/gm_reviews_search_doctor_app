@@ -12,14 +12,13 @@ import 'package:gm_reviews_search_doctor_app/utils/dialog.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------
 
-
 class HospitalInfoCard extends StatelessWidget {
   final Map<String, dynamic> place;
 
-  const HospitalInfoCard({
-    super.key,
-    required this.place,
-  });
+  // 引数
+  const HospitalInfoCard({super.key, required this.place});
+
+  // -------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +31,12 @@ class HospitalInfoCard extends StatelessWidget {
     final lng = place['geometry']['location']['lng'];
 
     final photoData = place['photos']?[0]['photo_reference'];
-    final imageUrl = photoData != null
-        ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoData&key=$apiKey'
-        : null;
+    final imageUrl =
+        photoData != null
+            ? 'https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=$photoData&key=$apiKey'
+            : null;
 
-    logger.i('[HospitalInfoCard] place内容確認: $place');
+    logInfo('[HospitalInfoCard] place内容確認: $place');
 
     return Card(
       margin: const EdgeInsets.all(8),
@@ -51,19 +51,20 @@ class HospitalInfoCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: imageUrl != null
-                    ? Image.network(
-                        imageUrl,
-                        width: 100,
-                        height: double.infinity,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        width: 100,
-                        height: double.infinity,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.image),
-                      ),
+                child:
+                    imageUrl != null
+                        ? Image.network(
+                          imageUrl,
+                          width: 100,
+                          height: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                        : Container(
+                          width: 100,
+                          height: double.infinity,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.image),
+                        ),
               ),
               const SizedBox(width: 12),
 
@@ -81,13 +82,21 @@ class HospitalInfoCard extends StatelessWidget {
                               text: linkText,
                               onTap: () async {
                                 try {
-                                  final uri = await GMDetailPlaceRequest.findPlaceWebsiteOrNull(placeId);
+                                  final uri =
+                                      await GMDetailPlaceRequest.findPlaceWebsiteOrNull(
+                                        placeId,
+                                      );
 
                                   if (uri != null) {
                                     if (await canLaunchUrl(uri)) {
-                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                      await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.externalApplication,
+                                      );
                                     } else {
-                                      logger.e('[HospitalInfoCard] リンク起動失敗: $uri');
+                                      logger.e(
+                                        '[HospitalInfoCard] リンク起動失敗: $uri',
+                                      );
                                       if (!context.mounted) return;
                                       showInfoDialog(
                                         context: context,
@@ -96,21 +105,24 @@ class HospitalInfoCard extends StatelessWidget {
                                       );
                                     }
                                   } else {
-                                    logger.w('[HospitalInfoCard] サイトが登録されていません: $linkText');
+                                    logger.w(
+                                      '[HospitalInfoCard] サイトが登録されていません: $linkText',
+                                    );
                                     if (!context.mounted) return;
-                                      showInfoDialog(
-                                        context: context,
-                                        title: '登録サイトなし',
-                                        message: 'この施設にはGoogleマップにサイトの登録されていないようです。',
-                                      );
+                                    showInfoDialog(
+                                      context: context,
+                                      title: '登録サイトなし',
+                                      message:
+                                          'この施設は、Googleマップ上にウェブサイトの情報が登録されていません。',
+                                    );
                                   }
                                 } catch (e) {
                                   if (!context.mounted) return;
-                                    showInfoDialog(
-                                      context: context,
-                                      title: 'サイトが開けませんでした',
-                                      message: '処理中にエラーが発生しました。後ほど再度お試しください。',
-                                    );
+                                  showInfoDialog(
+                                    context: context,
+                                    title: 'サイトが開けませんでした',
+                                    message: '処理中にエラーが発生しました。後ほど再度お試しください。',
+                                  );
                                   logger.e('[HospitalInfoCard] リンク取得エラー: $e');
                                   logger.e('StackTrace: ${StackTrace.current}');
                                 }
@@ -139,7 +151,9 @@ class HospitalInfoCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         LinkText(
                           text: addressText,
-                          linkUrl: Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng'),
+                          linkUrl: Uri.parse(
+                            'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+                          ),
                           fontSize: 12,
                           color: Colors.grey[700]!,
                         ),

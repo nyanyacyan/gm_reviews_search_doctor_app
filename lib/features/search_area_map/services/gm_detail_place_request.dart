@@ -1,12 +1,10 @@
+//? imports ====================================================
 import 'dart:convert' show json;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
-
-// **********************************************************************************
+// *************************************************************
 //? gm_detail_placeへのリクエストを行うクラス
 // マップアプリ（ブラウザ）を開くためにはdetail_placeのAPIを使用する必要がある
-
 
 class GMDetailPlaceRequest {
   static Future<Uri?> findPlaceWebsiteOrNull(String placeId) async {
@@ -29,4 +27,4 @@ class GMDetailPlaceRequest {
   }
 }
 
-// **********************************************************************************
+// *************************************************************

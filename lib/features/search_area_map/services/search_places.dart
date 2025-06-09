@@ -1,7 +1,7 @@
 // search_places.dart の先頭
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/geocode_service.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/nearby_search_service.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
 
 Future<List<Map<String, dynamic>>> getPlaces({
   required String station,
@@ -21,7 +21,6 @@ Future<List<Map<String, dynamic>>> getPlaces({
     );
 
     return results;
-
   } catch (e, stackTrace) {
     logger.e('[searchPlaces] エラー: $e');
     logger.e('[searchPlaces] StackTrace: $stackTrace');

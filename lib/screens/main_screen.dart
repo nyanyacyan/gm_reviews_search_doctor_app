@@ -1,3 +1,5 @@
+//? main_screenになる部分を定義
+//? imports ====================================================
 import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/utils/global_keys.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
@@ -7,6 +9,7 @@ import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/re
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/search_places.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
+// *************************************************************
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -14,6 +17,8 @@ class MainScreen extends StatefulWidget {
   @override
   State<MainScreen> createState() => _MainScreen();
 }
+
+// *************************************************************
 
 class _MainScreen extends State<MainScreen> {
   String _stationName = '';
@@ -28,13 +33,15 @@ class _MainScreen extends State<MainScreen> {
 
     // WidgetsBinding で post-frame に SnackBar 表示（テスト）
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      logger.i('[MainScreen] postFrameCallbackが呼ぼう');
+      logInfo('[MainScreen] postFrameCallbackが呼ぼう');
       ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
         const SnackBar(content: Text('✅ SnackBar 表示テスト in MainScreen')),
       );
-      logger.i('[MainScreen] postFrameCallbackが呼ばれました');
+      logInfo('[MainScreen] postFrameCallbackが呼ばれました');
     });
   }
+
+  // -------------------------------------------------------------
 
   Future<void> _search() async {
     try {
@@ -57,32 +64,31 @@ class _MainScreen extends State<MainScreen> {
 
         if (!mounted) return;
 
-        final scaffoldContext = context; // ← ここで一度保存！
-
         showModalBottomSheet(
-          context: scaffoldContext,
+          context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (_) => DraggableScrollableSheet(
-            initialChildSize: 0.4,
-            minChildSize: 0.2,
-            maxChildSize: 0.9,
-            expand: false,
-            builder: (_, scrollController) {
-              return Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                ),
-                child: ResultDisplay(
-                  places: _places,
-                  scrollController: scrollController, // スクロールコントローラーを渡す
-                ),
-              );
-            },
-          ),
+          builder:
+              (_) => DraggableScrollableSheet(
+                initialChildSize: 0.4,
+                minChildSize: 0.2,
+                maxChildSize: 0.9,
+                expand: false,
+                builder: (_, scrollController) {
+                  return Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    child: ResultDisplay(
+                      places: _places,
+                      scrollController: scrollController, // スクロールコントローラーを渡す
+                    ),
+                  );
+                },
+              ),
         );
       } else {
         if (!mounted) return; // ウィジェットがまだマウントされているか確認
@@ -100,9 +106,11 @@ class _MainScreen extends State<MainScreen> {
     }
   }
 
+  // -------------------------------------------------------------
+
   @override
   Widget build(BuildContext context) {
-    logger.d(
+    logDebug(
       '[MainScreen] ビルド開始: _stationName=$_stationName, _selectedCategory=$_selectedCategory',
     );
 
@@ -135,3 +143,5 @@ class _MainScreen extends State<MainScreen> {
     );
   }
 }
+
+// *************************************************************
