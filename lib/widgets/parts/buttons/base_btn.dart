@@ -1,7 +1,7 @@
 //? 検索ボタン関係を格納するファイル
 //? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 //* ------------------------------------------------------------
 
 class BaseBtn extends StatelessWidget {

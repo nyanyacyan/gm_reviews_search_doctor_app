@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 import 'package:gm_reviews_search_doctor_app/const/select_value.dart';
 
 class NearbySearchService {

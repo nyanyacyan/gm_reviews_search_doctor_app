@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:gm_reviews_search_doctor_app/utils/logDebugart';
+import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 
 // **********************************************************************************
 //? 駅名から緯度経度を取得するGoogle Geocoding APIサービス  Build不要
