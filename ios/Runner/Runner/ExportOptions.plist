@@ -8,7 +8,7 @@
   <string>manual</string>
   <key>provisioningProfiles</key>
   <dict>
-    <key>com.example.gmReviewsSearchDoctorApp</key>
+    <key>com.nyanyacyan.gm_reviews_search_doctor_app</key>
     <string>にゃにゃちゃん</string> <!-- プロファイル名をここに -->
   </dict>
   <key>teamID</key>

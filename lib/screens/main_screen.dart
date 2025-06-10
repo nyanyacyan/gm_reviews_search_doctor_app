@@ -27,20 +27,6 @@ class _MainScreen extends State<MainScreen> {
 
   final List<String> _categoryItems = SelectValue.medicalTypeList;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   // WidgetsBinding で post-frame に SnackBar 表示（テスト）
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     logInfo('[MainScreen] postFrameCallbackが呼ぼう');
-  //     ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
-  //       const SnackBar(content: Text('✅ SnackBar 表示テスト in MainScreen')),
-  //     );
-  //     logInfo('[MainScreen] postFrameCallbackが呼ばれました');
-  //   });
-  // }
-
   // -------------------------------------------------------------
 
   Future<void> _search() async {
@@ -118,26 +104,41 @@ class _MainScreen extends State<MainScreen> {
       appBar: AppBar(title: const Text(MainWidgetStrings.appTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SearchInputScreen(
-          labelText: MainWidgetStrings.searchInputScreenTitle,
-          hintText: MainWidgetStrings.inputHintText,
-          inputText: _stationName,
-          selectedFilterValue: _selectedCategory,
-          items: _categoryItems,
-          errMsgDropdownEmpty: MainWidgetStrings.errMsgDropdownEmpty,
-          btnLabelName: MainWidgetStrings.searchBtnLabel,
-          defaultFilterValue: _categoryItems.first,
-          onChangedInputText: (value) {
-            setState(() {
-              _stationName = value;
-            });
-          },
-          onDropdownChanged: (context, newValue) {
-            setState(() {
-              _selectedCategory = newValue;
-            });
-          },
-          onSearchPressed: () => _search(), // ← 引数で渡す！
+        child: Column(
+          // ← ここを Column にして画像とUIを縦に並べる
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              'assets/home_image.png',
+              fit: BoxFit.cover, // 横幅にフィット
+              width: double.infinity, // 画面幅に広げる
+              height: 160, // 任意の高さ
+            ),
+            const SizedBox(height: 16), // スペース追加
+            Expanded(
+              child: SearchInputScreen(
+                labelText: MainWidgetStrings.searchInputScreenTitle,
+                hintText: MainWidgetStrings.inputHintText,
+                inputText: _stationName,
+                selectedFilterValue: _selectedCategory,
+                items: _categoryItems,
+                errMsgDropdownEmpty: MainWidgetStrings.errMsgDropdownEmpty,
+                btnLabelName: MainWidgetStrings.searchBtnLabel,
+                defaultFilterValue: _categoryItems.first,
+                onChangedInputText: (value) {
+                  setState(() {
+                    _stationName = value;
+                  });
+                },
+                onDropdownChanged: (context, newValue) {
+                  setState(() {
+                    _selectedCategory = newValue;
+                  });
+                },
+                onSearchPressed: () => _search(),
+              ),
+            ),
+          ],
         ),
       ),
     );

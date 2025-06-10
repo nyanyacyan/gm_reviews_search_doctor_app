@@ -11,9 +11,9 @@ plugins {
 }
 
 android {
-    namespace = "com.example.gm_reviews_search_doctor_app"
+    namespace = "com.nyanyacyan.gm_reviews_search_doctor_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
     // Androidのバージョンを指定
     compileOptions {
@@ -29,7 +29,7 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         // アプリケーションIDを指定
-        applicationId = "com.nyanyacyan.gmreviews"
+        applicationId = "com.nyanyacyan.gm_reviews_search_doctor_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -14,7 +14,7 @@ Future<void> main() async {
   await setupLogger(); // logger を初期化
 
   //? dart-define で渡された ENV 変数から読み込む .env ファイルを指定
-  const envFile = String.fromEnvironment('ENV', defaultValue: '.env.macos');
+  const envFile = String.fromEnvironment('ENV', defaultValue: '.env.android');
   await dotenv.load(fileName: envFile); // .envからAPIキーなどを読み込む
 
   runApp(const MyApp());

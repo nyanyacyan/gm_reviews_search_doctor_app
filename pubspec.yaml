@@ -46,10 +46,12 @@ flutter:
     - .env.android
     - assets/icon/fix_app_icon.png
     - assets/no_image_photo.png
+    - assets/home_image.png
 
 # iconの設定
 flutter_icons:
   android: true
   ios: true
   image_path: "assets/icon/fix_app_icon.png"
+
 
