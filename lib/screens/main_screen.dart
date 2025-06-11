@@ -1,6 +1,7 @@
 //? main_screenになる部分を定義
 //? imports ====================================================
 import 'package:flutter/material.dart';
+import 'package:gm_reviews_search_doctor_app/utils/dialog.dart';
 import 'package:gm_reviews_search_doctor_app/utils/global_keys.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
 import 'package:gm_reviews_search_doctor_app/const/select_value.dart';
@@ -8,6 +9,7 @@ import 'package:gm_reviews_search_doctor_app/widgets/search_input_screen.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/result_display.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/search_places.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/exceptions.dart';
 
 // *************************************************************
 
@@ -54,40 +56,46 @@ class _MainScreen extends State<MainScreen> {
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder:
-              (_) => DraggableScrollableSheet(
-                initialChildSize: 0.4,
-                minChildSize: 0.2,
-                maxChildSize: 0.9,
-                expand: false,
-                builder: (_, scrollController) {
-                  return Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                    ),
-                    child: ResultDisplay(
-                      places: _places,
-                      scrollController: scrollController, // スクロールコントローラーを渡す
-                    ),
-                  );
-                },
-              ),
+          builder: (_) => DraggableScrollableSheet(
+            initialChildSize: 0.4,
+            minChildSize: 0.2,
+            maxChildSize: 0.9,
+            expand: false,
+            builder: (_, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                ),
+                child: ResultDisplay(
+                  places: _places,
+                  scrollController: scrollController,
+                ),
+              );
+            },
+          ),
         );
       } else {
-        if (!mounted) return; // ウィジェットがまだマウントされているか確認
-        ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
-          const SnackBar(content: Text(MainWidgetStrings.errMsgDropdownEmpty)),
-        );
+        // 病院が見つからなかった場合
+        throw NoHospitalsFoundException(); // 明示的に投げる必要あり
       }
-    } catch (e, stackTrace) {
-      logger.e('検索中にエラーが発生しました: $e');
-      logger.e('StackTrace: $stackTrace');
-      if (!mounted) return; // ウィジェットがまだマウントされているか確認
-      ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(
-        const SnackBar(content: Text(MainWidgetStrings.errMsgSearchFailed)),
+
+    } on StationNotFoundException {
+      await showErrorDialog(
+        context: context,
+        message: '駅名が見つかりませんでした。正しい駅名を入力してください。',
+      );
+    } on NoHospitalsFoundException {
+      await showErrorDialog(
+        context: context,
+        message: '指定した駅周辺に該当する病院が見つかりませんでした。',
+      );
+    } catch (e) {
+      await showErrorDialog(
+        context: context,
+        message: '検索中にエラーが発生しました。通信状況をご確認ください。',
       );
     }
   }
