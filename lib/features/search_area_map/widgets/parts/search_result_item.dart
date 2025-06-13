@@ -6,8 +6,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 // import 'package:gm_reviews_search_doctor_app/widgets/parts/images/base_image.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/link_text.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/texts/base_text.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/parts/texts/link_text.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/parts/texts/base_text.dart';
 import 'package:gm_reviews_search_doctor_app/utils/dialog.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/gm_detail_place_request.dart';
 //* ------------------------------------------------------------

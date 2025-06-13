@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:gm_reviews_search_doctor_app/utils/dialog.dart';
 import 'package:gm_reviews_search_doctor_app/const/strings.dart';
 import 'package:gm_reviews_search_doctor_app/const/select_value.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/search_input_screen.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/search_input_screen.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/widgets/result_display.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/search_places.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';

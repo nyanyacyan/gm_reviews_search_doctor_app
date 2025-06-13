@@ -1,9 +1,9 @@
 //? キーワードとdropdownの値を返すwidget
 //? imports ===============================================
 import 'package:flutter/material.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/input_text_field.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/dropdown_select.dart';
-import 'package:gm_reviews_search_doctor_app/widgets/parts/buttons/base_btn.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/parts/input_text_field.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/parts/dropdown_select.dart';
+import 'package:gm_reviews_search_doctor_app/basic_widgets/parts/buttons/base_btn.dart';
 //* ------------------------------------------------------------
 
 class SearchInputScreen extends StatelessWidget {
