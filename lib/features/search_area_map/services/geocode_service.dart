@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
+import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/exceptions.dart';
 
 // **********************************************************************************
 //? 駅名から緯度経度を取得するGoogle Geocoding APIサービス  Build不要
@@ -23,6 +24,12 @@ class GeocodeService {
       logDebug('デコードされたデータ: $data'); // デコード後のデータのログ出力
 
       final status = data['status'];
+
+      // もしステータスが "ZERO_RESULTS" ならば、駅が見つからなかったことを示す
+      if (status == "ZERO_RESULTS") {
+        throw StationNotFoundException(); // ← ここで投げる
+      }
+
       if (status != "OK") throw Exception('Geocode API status=$status');
 
       final location = data['results'][0]['geometry']['location'];
@@ -41,11 +48,14 @@ class GeocodeService {
       //! 駅の緯度経度から周辺情報を取得するためにこの緯度と経度を使ってPlace APIを呼び出す必要がある
       return stationLocation;
     } catch (e, stackTrace) {
-      logger.e('Geocode APIエラー: $e');
-      logger.e('StackTrace: $stackTrace');
-      throw Exception('Geocode APIエラー: $e');
-    }
+        logger.e('Geocode APIエラー: $e');
+        logger.e('StackTrace: $stackTrace');
+        throw StationNotFoundException(); // 駅が見つからなかった場合に例外を投げる
+      }
   }
 }
 
 // **********************************************************************************
+
+
+

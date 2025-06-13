@@ -8,7 +8,7 @@
 PRODUCT_NAME = gm_reviews_search_doctor_app
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.gmReviewsSearchDoctorApp
+PRODUCT_BUNDLE_IDENTIFIER = com.example.gmReviewsNew
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 com.example. All rights reserved.

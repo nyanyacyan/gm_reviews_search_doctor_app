@@ -55,14 +55,17 @@ class SearchInputScreen extends StatelessWidget {
 
         // 絞り込み選択（ドロップダウン）
         Center(
-          child: DropdownSelect(
-            selectedValue: selectedFilterValue,
-            items: items,
-            onChanged: (newValue) {
-              if (newValue != null) {
-                onDropdownChanged(context, newValue);
-              }
-            },
+          child: SizedBox(
+            width: 245,
+            child: DropdownSelect(
+              selectedValue: selectedFilterValue,
+              items: items,
+              onChanged: (newValue) {
+                if (newValue != null) {
+                  onDropdownChanged(context, newValue);
+                }
+              },
+            ),
           ),
         ),
         const SizedBox(height: 16),

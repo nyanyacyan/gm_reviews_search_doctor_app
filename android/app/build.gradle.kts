@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.nyanyacyan.gm_reviews_search_doctor_app"
+        applicationId = "com.nyanyacyan.gmreviews"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

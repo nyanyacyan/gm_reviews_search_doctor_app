@@ -1,4 +1,4 @@
-package com.nyanyacyan.gm_reviews_search_doctor_app
+package com.nyanyacyan.gmreviews
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -26,7 +26,7 @@ class DropdownSelect extends StatelessWidget {
     logDebug('DropdownSelect: selectedValue: $selectedValue, items: $items');
     return Center(
       child: SizedBox(
-        width: 180,
+        width: 245,
         child: DropdownButton<String>(
           value: selectedValue,
           alignment: Alignment.center, //

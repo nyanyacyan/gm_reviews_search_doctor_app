@@ -8,8 +8,8 @@
   <string>manual</string>
   <key>provisioningProfiles</key>
   <dict>
-    <key>com.nyanyacyan.gm_reviews_search_doctor_app</key>
-    <string>にゃにゃちゃん</string> <!-- プロファイル名をここに -->
+    <key>com.nyanyacyan.gmReviewsSearchDoctorApp</key>
+    <string>AppStore_KuchikomiDoctor_Prod</string> <!-- プロファイル名をここに -->
   </dict>
   <key>teamID</key>
   <string>HP3QCLU5B8</string>

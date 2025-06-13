@@ -16,12 +16,12 @@ class WidgetStrings {
   static const String mapButton = 'GoogleMapで開く';
   static const String noData = 'データがありません';
   static const String errorMessage = 'エラーが発生しました';
-  static const String initialValue = '選択してください';
+  static const String initialValue = '診療科目を選択してください';
 }
 
 class MainWidgetStrings {
   static const String appTitle = '口コミドクター';
-  static const String initialValue = '選択してください';
+  static const String initialValue = '診療科目を選択してください';
   static const String searchBtnLabel = '検索';
   static const String searchInputScreenTitle = '駅名を入力入力してください';
   static const String inputHintText = '例）新橋';

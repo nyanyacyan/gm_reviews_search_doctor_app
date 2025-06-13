@@ -16,7 +16,7 @@ class SelectValue {
 
 
   static const List<String> medicalTypeList = [
-    '選択してください',
+    '診療科目を選択してください',
     '小児科',
     '内科',
     '耳鼻科',
