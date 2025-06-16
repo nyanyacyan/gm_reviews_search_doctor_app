@@ -10,7 +10,7 @@ Future<List<Map<String, dynamic>>> getPlaces({
 }) async {
   try {
     // ① 駅名から緯度・経度を取得
-    final location = await GeocodeService.getStationLocation(station);
+    final location = await getStationLocation(station);
     final lat = location['lat']!;
     final lng = location['lng']!;
 
