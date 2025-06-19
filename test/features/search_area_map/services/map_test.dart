@@ -20,7 +20,10 @@ void main() {
     () async{
       final stationLocation = await getStationLocation('新宿駅');
 
+      // 取得した値がMap<String, double>型であることを確認
       expect(stationLocation, isA<Map<String, double>>());
+
+      // containsKeyを使って、Mapに特定のキーが存在するか確認
       expect(stationLocation.containsKey('lat'), true);
       expect(stationLocation.containsKey('lng'), true);
     },

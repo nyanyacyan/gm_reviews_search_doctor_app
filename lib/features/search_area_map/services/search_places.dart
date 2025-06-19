@@ -5,10 +5,12 @@ import 'package:gm_reviews_search_doctor_app/utils/logger.dart';
 import 'package:gm_reviews_search_doctor_app/features/search_area_map/services/exceptions.dart';
 
 Future<List<Map<String, dynamic>>> getPlaces({
+  // 引数
   required String station,
   required String category,
 }) async {
   try {
+    // 変数を定義
     // ① 駅名から緯度・経度を取得
     final location = await getStationLocation(station);
     final lat = location['lat']!;
